@@ -20,6 +20,7 @@
 
 import requests
 from enum import Enum
+from source import users
 
 # Замените 'YOUR_ACCESS_TOKEN' на ваш токен доступа
 ACCESS_TOKEN = 'c5aebac8c5aebac8c5aebac8fac68ec9b3cc5aec5aebac8a2a6aaffbc053a29d4c6cf6d'
@@ -28,6 +29,10 @@ POST_ID = 'vk_post_394305035_1304'   # Замените на ID поста !!! �
 COUNT_POSTS = 10 # количество постов
 FILTER = 'owner' # Записи владельца или других пользователей
 OFFSET = 0 # Сдвиг
+
+#Вызов новой функции
+users.GetBase(USER_ID)
+
 class CHOICE(Enum):
     TEXT = 'text'
     PHOTO = 'photo'
@@ -94,3 +99,4 @@ if(YOURCHOICE == "photo"):
                 print(f"id => {elements['id']}")
                 print("фото нет")
                 print("--------------------------------------\n")
+
