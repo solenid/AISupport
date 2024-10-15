@@ -5,8 +5,8 @@
 
 # START
 import requests
-from source import users
-from source import data
+from users import users
+from data import data
 
 
 def userIdInteger():
@@ -79,3 +79,5 @@ def main():
     users.GetBase(data.USER_ID)
 
     print("end main")
+
+main()
