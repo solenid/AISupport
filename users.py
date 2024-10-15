@@ -1,22 +1,10 @@
 import requests
-from enum import Enum
+from source import data as dat
 
-def GetBase(USER_ID):
-    # Замените 'YOUR_ACCESS_TOKEN' на ваш токен доступа
-    ACCESS_TOKEN = 'c5aebac8c5aebac8c5aebac8fac68ec9b3cc5aec5aebac8a2a6aaffbc053a29d4c6cf6d'
-    #USER_ID = 'aidkhall'  # Замените на ID пользователя
-
-    urlUSERSget = 'https://api.vk.com/method/users.get'
-    # Параметры запроса
-    paramsForUserGet = {
-        'access_token': ACCESS_TOKEN,
-        'user_ids': f'{USER_ID}',
-        'fields': ' status , photo, bdate, universities, interests, schools',
-        'v': '5.131'  # Версия API
-    }
+def GetBase():
 
     # Выполнение запроса
-    userGetResp = requests.get(urlUSERSget, params=paramsForUserGet)
+    userGetResp = requests.get(dat.urlUSERSget, params=dat.paramsForUserGet)
     data = userGetResp.json()
     #print(data)
     # Если ответ получен

@@ -5,8 +5,8 @@
 
 # START
 import requests
-from source import users
 from source import data
+import users
 
 
 def userIdInteger():
@@ -76,6 +76,8 @@ def main():
     userGetInfo(YOURCHOICE)
     
     #Вызов новой функции
-    users.GetBase(data.USER_ID)
+    users.GetBase()
 
     print("end main")
+
+main()
