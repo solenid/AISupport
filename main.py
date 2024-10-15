@@ -5,6 +5,7 @@
 
 # START
 import requests
+from source import users
 from source import data
 
 
@@ -73,7 +74,8 @@ def main():
     print("Вы выбрали: " + YOURCHOICE)
 
     userGetInfo(YOURCHOICE)
+    
+    #Вызов новой функции
+    users.GetBase(data.USER_ID)
 
     print("end main")
-
-main()
