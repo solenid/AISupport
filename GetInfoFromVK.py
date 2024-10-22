@@ -41,6 +41,10 @@ def get_posts_text(posts):
     posts_text = [post.get('text', '') for post in posts]
     return posts_text
 
+# def get_posts_photo(posts):
+#     posts_photo = [post.get('photo', '') for post in posts]
+#     return posts_photo
+
 def get_publics_theme(vk, user_id):
     try:
         response = vk.groups.get(user_id=user_id, count=0)
