@@ -1,13 +1,7 @@
-# https://vk.com/sveeecha
-# https://vk.com/aidkhall
-# c5aebac8c5aebac8c5aebac8fac68ec9b3cc5aec5aebac8a2a6aaffbc053a29d4c6cf6d
-# f5047191f5047191f5047191caf624eadeff504f5047191920feda5943381a1caa2ddf2
-
 # START
 import requests
-
+from data import data
 from colorCHECK import colorCHECK
-from source import data
 import users
 import numpy as np
 from tensorflow import keras
@@ -168,7 +162,6 @@ def main():
     for i in arrayUrl:
         print("New url => " + i)
         testLusher(np.array(colorCHECK(i,15)))
-
 
     print("end main")
 
