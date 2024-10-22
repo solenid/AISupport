@@ -15,8 +15,7 @@ def analyze():
     input_text = get_numeric_id(input_text, TOKEN)
     result = get_info(input_text)
     resultTestLusher = tL.startTestLusher(input_text)
-    for everyResultTest in resultTestLusher:
-        result.append(str(everyResultTest))
+    result.append(resultTestLusher)
     text_output.config(state='normal')
     text_output.delete("1.0", tk.END)
     for text in result:
