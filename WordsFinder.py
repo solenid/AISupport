@@ -18,6 +18,9 @@ def forbidden_words_search(test_texts, count) -> int:
         if pred == 1:
             count += 1
     return count
+
+
+
 def predict_profanity_forbidden(texts):
     inputs = tokenizer(texts, padding=True, truncation=True, return_tensors="pt", max_length=128)
     inputs = {key: value.to(device) for key, value in inputs.items()}
