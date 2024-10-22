@@ -4,9 +4,10 @@ from CheckSpelling import *
 from WordsFinder import *
 from GetPosts import *
 from GetToken import *
+from UsersGet import *
+
 
 TOKEN = get_token()
-
 
 def get_vk_session(token):
     try:
@@ -82,8 +83,14 @@ def get_info(user_id: str):
     result = [f"Используемый user_id: {user_id}"]
     start_time = time.time()
     vk = get_vk_session(TOKEN)
+
     if vk is None:
         exit()
+
+    base = GetBase(vk, user_id)
+    for res in base:
+        result.append(res)
+
     # 1. Количество друзей
     number_of_friends = get_number_of_friends(vk, user_id)
     if number_of_friends is not None:
@@ -92,43 +99,46 @@ def get_info(user_id: str):
     # 2. Получение кол-ва постов за год
     posts = get_posts_for_last_year(vk, user_id)
     result.append(f"Всего постов за год: {len(posts)}")
+    if len(posts) > 0:
+        # 3. Общее количество комментариев за год
+        total_comments = get_total_comments(posts)
+        result.append(f"Общее количество комментариев за год: {total_comments}")
 
-    # 3. Общее количество комментариев за год
-    total_comments = get_total_comments(posts)
-    result.append(f"Общее количество комментариев за год: {total_comments}")
+        # 4. Общее количество лайков за год
+        total_likes = get_total_likes(posts)
+        result.append(f"Общее количество лайков за год: {total_likes}")
 
-    # 4. Общее количество лайков за год
-    total_likes = get_total_likes(posts)
-    result.append(f"Общее количество лайков за год: {total_likes}")
+        #!Если есть текст в постах
+        posts_text = get_posts_text(posts)
+        if posts_text:
+            # 5. Тексты постов за год и проверка на ошибки
+            errors_counts = 0
+            for idx, text in enumerate(posts_text, 1):
+                errors = check_spelling(text)
+                if errors:
+                    errors_counts += len(errors)
+            result.append(f"Общее кол-во ошибок в постах за год : {errors_counts}")
+            # 6. Количество матерных слов в постах
+            total_forbidden_count = 0
 
-    # 5. Тексты постов за год и проверка на ошибки
-    posts_text = get_posts_text(posts)
-    errors_counts = 0
-    for idx, text in enumerate(posts_text, 1):
-        errors = check_spelling(text)
-        if errors:
-            errors_counts += len(errors)
-    result.append(f"Общее кол-во ошибок в постах за год : {errors_counts}")
+            forbidden_words_search(posts_text, total_forbidden_count)
+            result.append(f"Общее кол-во матерных слов в постах: {total_forbidden_count}")
 
-    # 6. Количество матерных слов в постах
-    total_forbidden_count = 0
-    forbidden_words_search(posts_text, total_forbidden_count)
-    result.append(f"Общее кол-во матерных слов в постах: {total_forbidden_count}")
+            # 7. Количество экстремистких слов в постах
+            total_forbidden_count = 0
+            for text in posts_text:
+                forbiddenCount = count_extremism_words(text)
+                total_forbidden_count += forbiddenCount
+            result.append(f"Общее кол-во экстремистких слов в постах: {total_forbidden_count}")
 
-    # 7. Количество экстремистких слов в постах
-    total_forbidden_count = 0
-    for text in posts_text:
-        forbiddenCount = count_extremism_words(text)
-        total_forbidden_count += forbiddenCount
-    result.append(f"Общее кол-во экстремистких слов в постах: {total_forbidden_count}")
-
-    # 8. Количество слов-угроз в постах
-    total_forbidden_count = 0
-    for text in posts_text:
-        forbiddenCount = count_threat_words(text)
-        total_forbidden_count += forbiddenCount
-    result.append(f"Общее кол-во слов-угроз в постах: {total_forbidden_count}")
-
+            # 8. Количество слов-угроз в постах
+            total_forbidden_count = 0
+            for text in posts_text:
+                forbiddenCount = count_threat_words(text)
+                total_forbidden_count += forbiddenCount
+            result.append(f"Общее кол-во слов-угроз в постах: {total_forbidden_count}")
+        else:
+            result.append(f"Общее кол-во слов в постах: 0")
     # 9. Тематики групп пользователя
     themes = get_groups_theme(vk, user_id)
     result.append("Тематики групп пользователя:")
