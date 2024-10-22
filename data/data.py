@@ -17,15 +17,8 @@ class CHOICE(Enum):
 urlWallGetById = 'https://api.vk.com/method/wall.get'
 urlUtilsResolveScreenName = 'https://api.vk.com/method/utils.resolveScreenName'
 urlFriendsGet = 'https://api.vk.com/method/friends.get'
-urlUSERSget = 'https://api.vk.com/method/users.get'
 
-# Параметры запроса
-paramsForUserGet = {
-    'access_token': ACCESS_TOKEN,
-    'user_ids': f'{USER_ID}',
-    'fields': ' status , photo, bdate, universities, interests, schools',
-    'v': '5.131'  # Версия API
-}
+
 # Параметры запроса
 paramsForWallGetById = {
     'access_token': ACCESS_TOKEN,

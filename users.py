@@ -1,10 +1,26 @@
 import requests
-from source import data as dat
+<<<<<<< HEAD
+from data import data as dat
 
 def GetBase():
 
     # Выполнение запроса
     userGetResp = requests.get(dat.urlUSERSget, params=dat.paramsForUserGet)
+=======
+
+SERVICE_TOKEN = 'c0754f89c0754f89c0754f892cc3543dbccc075c0754f89a763ae63b86c6df9fd886d21'
+urlUSERSget = 'https://api.vk.com/method/users.get'
+
+def GetBase(USER_ID):
+    paramsForUserGet = {
+        'access_token': SERVICE_TOKEN,
+        'user_ids': f'{USER_ID}',
+        'fields': ' status , photo, bdate, universities, interests, schools',
+        'v': '5.131'  # Версия API
+    }
+    # Выполнение запроса
+    userGetResp = requests.get(urlUSERSget, params=paramsForUserGet)
+>>>>>>> 737b125 (Add autorization)
     data = userGetResp.json()
     #print(data)
     # Если ответ получен
