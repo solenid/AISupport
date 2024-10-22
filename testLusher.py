@@ -1,5 +1,7 @@
 # START
 import requests
+from keras.src.backend.jax.core import switch
+
 import GetToken as gt
 from colorCHECK import colorCHECK
 import users
@@ -92,40 +94,44 @@ def print_rgb(r, g, b, text):
     print(f"\033[38;2;{r};{g};{b}m{text}\033[0m")
 
 
-def whatIsColorMean(indexLargeElement):
+def whatIsColorMean(indexLargeElement, countColor):
     if indexLargeElement == 0:
-        return (
-            "Синий и его оттенки доминируют"
-            "Это означает, что:\n"
-            "Синий тип - спокойный и уверенный в себе человек. Таким людям важно чувствовать себя в безопасности, быть всегда защищенными."
-        )
+        countColor['blue']+=1
+        # return (
+        #     "Синий и его оттенки доминируют"
+        #     "Это означает, что:\n"
+        #     "Синий тип - спокойный и уверенный в себе человек. Таким людям важно чувствовать себя в безопасности, быть всегда защищенными."
+        # )
 
     if indexLargeElement == 1:
-        return (
-            "Желтый доминирует\n"
-            "Это означает, что:\n"
-            "Желтый тип - общительный, отзывчивый человек. Им хорошо подходят широкие социальные контакты."
-        )
+        countColor['yellow'] += 1
+        # return (
+        #     "Желтый доминирует\n"
+        #     "Это означает, что:\n"
+        #     "Желтый тип - общительный, отзывчивый человек. Им хорошо подходят широкие социальные контакты."
+        # )
 
     if indexLargeElement == 2:
-        return (
-            "Зеленый доминирует\n"
-            "Это означает, что:\n"
-            "Зеленый тип - настойчивый, но робкий человек. Ему комфортно в условиях, которые дают ощущение значимости и достоинства."
-        )
+        countColor['green'] += 1
+        # return (
+        #     "Зеленый доминирует\n"
+        #     "Это означает, что:\n"
+        #     "Зеленый тип - настойчивый, но робкий человек. Ему комфортно в условиях, которые дают ощущение значимости и достоинства."
+        # )
 
     if indexLargeElement == 3:
-        return (
-            "Красный доминирует\n"
-            "Это означает, что:\n"
-            "Красный тип - энергичный человек. Такие люди чувствуют себя комфортно в активной деятельности."
-        )
+        countColor['red'] += 1
+        # return (
+        #     "Красный доминирует\n"
+        #     "Это означает, что:\n"
+        #     "Красный тип - энергичный человек. Такие люди чувствуют себя комфортно в активной деятельности."
+        # )
 
-    return "Некорректный индекс цвета."
+    # return "Некорректный индекс цвета."
 
 
 
-def testLusher(x):
+def testLusher(x, countColor):
     modelBlue = keras.models.load_model('AiModel/my_model.keras')
     modelYellow = keras.models.load_model('AiModel/my_modelYELLOW.keras')
     modelGreen = keras.models.load_model('AiModel/my_modelGREEN.keras')
@@ -139,9 +145,9 @@ def testLusher(x):
 
     sumPrediction = [sum(predictionBlue), sum(predictionYellow), sum(predictionGreen), sum(predictionRed)]
     indexLargeElement = sumPrediction.index(max(sumPrediction))
-    testResult = whatIsColorMean(indexLargeElement)
+    whatIsColorMean(indexLargeElement, countColor)
 
-    return testResult
+    # return testResult
 
     # print("Вывод для наглядного просмотра")
     #
@@ -179,17 +185,43 @@ def testLusher(x):
 
 
 def startTestLusher(user_id: str):
-    testResult = []
     result = get_posts_photo(user_id,TOKEN)
     print(result)
 
-    indexPhoto = 0
+    countColor = {
+        'blue': 0,
+        'red': 0,
+        'yellow': 0,
+        "green": 0
+    }
+
+    # indexPhoto = 0
     for i in result[0]:
         print("New url => " + i)
-        string = ("Индекс поста: " + str(result[1][indexPhoto]) + "\nНейросеть определила, что в данной фотографии ")
-        testResult.append(string + testLusher(np.array(colorCHECK(i,3))))
-        indexPhoto+=1
+        testLusher(np.array(colorCHECK(i, 15)), countColor)
+        # string = ("Индекс поста: " + str(result[1][indexPhoto]) + "\nНейросеть определила, что в данной фотографии ")
+        # testResult.append(string + testLusher(np.array(colorCHECK(i,3)),countColor))
+        # indexPhoto+=1
 
+    mostPopularColor = (max(countColor, key=countColor.get))
 
-    # print(testResult)
-    return testResult
+    message = "Не определён"
+
+    match mostPopularColor:
+        case 'yellow':
+            message = (" Самый часто используемый цвет на фото данного пользователя: ЖЕЛТЫЙ " +
+                       "Это значит что человек попадает под желтый тип" +
+                       "Желтый тип - общительный, отзывчивый человек.  Им хорошо подходят  широкие социальные контакты.")
+        case 'blue':
+            message = (" Самый часто используемый цвет на фото данного пользователя: СИНИЙ " +
+                       "Это значит что человек попадает под синий тип" +
+                       "Синий тип - спокойный и уверенный в себе человек. Таким людям важно чувствовать себя в безопасности, быть всегда защищенными.")
+        case 'red':
+            message = (" Самый часто используемый цвет на фото данного пользователя: КРАСНЫЙ " +
+                       "Это значит что человек попадает под желтый тип" +
+                       "Красный тип - энергичный человек. Такие люди чувствует себя комфортно в активной деятельности.")
+        case 'green':
+            message = (" Самый часто используемый цвет на фото данного пользователя: ЗЕЛЁНЫЙ " +
+                       "Это значит что человек попадает под желтый тип" +
+                       "Зеленый тип - настойчивый, но робкий человек. Ему комфортно в условиях, которые дают ощущение значимости и достоинства.")
+    return message
