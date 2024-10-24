@@ -198,7 +198,7 @@ def startTestLusher(user_id: str):
     # indexPhoto = 0
     for i in result[0]:
         print("New url => " + i)
-        testLusher(np.array(colorCHECK(i, 15)), countColor)
+        testLusher(np.array(colorCHECK(i, 5)), countColor)
         # string = ("Индекс поста: " + str(result[1][indexPhoto]) + "\nНейросеть определила, что в данной фотографии ")
         # testResult.append(string + testLusher(np.array(colorCHECK(i,3)),countColor))
         # indexPhoto+=1

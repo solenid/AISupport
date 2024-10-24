@@ -14,9 +14,11 @@ AUTH_URL = (
     f"&display=page&redirect_uri={REDIRECT_URI}"
     f"&scope={SCOPE}&response_type=code&v=5.131"
 )
+
 authorization_code = None
 access_token = None
 server = None
+
 
 class OAuthHandler(BaseHTTPRequestHandler):
     def do_GET(self):
@@ -29,13 +31,13 @@ class OAuthHandler(BaseHTTPRequestHandler):
             self.send_response(200)
             self.send_header('Content-type', 'text/html')
             self.end_headers()
-            print(f"Получен код авторизации: {authorization_code}")
+            self.wfile.write(b"<html><body><h1>Autorization complete</h1></body></html>")
             threading.Thread(target=shutdown_server).start()
         else:
             self.send_response(400)
             self.send_header('Content-type', 'text/html')
             self.end_headers()
-            print("Ошибка: Код авторизации не найден в запросу.")
+            self.wfile.write(b"<html><body><h1>Autorization ERROR</h1></body></html>")
 
 def run_server():
     global server
@@ -57,7 +59,6 @@ def exchange_code_for_token(code):
         'redirect_uri': REDIRECT_URI,
         'code': code
     }
-    print("Отправка параметров для обмена кода на токен:", params)  # Отладочный вывод
     try:
         response = requests.get(token_url, params=params)
         response.raise_for_status()
@@ -65,22 +66,21 @@ def exchange_code_for_token(code):
         if 'access_token' in data:
             return data['access_token']
         else:
-            print("Ошибка при обмене кода на токен:", data)
             return None
     except requests.exceptions.RequestException as e:
         print(f"HTTP ошибка при обмене кода на токен: {e}")
         return None
-def main():
+
+def user_authorization():
     global access_token
     server_thread = threading.Thread(target=run_server)
     server_thread.daemon = True
     server_thread.start()
-    print("Открываем браузер для авторизации...")
     webbrowser.open(AUTH_URL)
     while authorization_code is None:
         time.sleep(1)
     access_token = exchange_code_for_token(authorization_code)
     if access_token:
-        print("Токен доступа получен:", access_token)
+        return access_token
     else:
         print("Не удалось получить токен доступа.")
