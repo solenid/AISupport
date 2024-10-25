@@ -6,8 +6,8 @@ from GetPosts import *
 from GetToken import *
 from UsersGet import *
 
-
 TOKEN = get_token()
+
 
 def get_vk_session(token):
     try:
@@ -83,18 +83,15 @@ def get_groups_theme(vk, user_id):
     return list(themes)
 
 
-def get_info(user_id: str):
+def get_info(user_id: str, SERVICE_TOKEN, USER_TOKEN):
     result = [f"Используемый user_id: {user_id}"]
     start_time = time.time()
-    vk = get_vk_session(TOKEN)
-
+    vk = get_vk_session(SERVICE_TOKEN)
     if vk is None:
         exit()
-
     base = GetBase(vk, user_id)
     for res in base:
         result.append(res)
-
     # 1. Количество друзей
     number_of_friends = get_number_of_friends(vk, user_id)
     if number_of_friends is not None:
@@ -144,6 +141,7 @@ def get_info(user_id: str):
         else:
             result.append(f"Общее кол-во слов в постах: 0")
     # 9. Тематики групп пользователя
+    vk = get_vk_session(USER_TOKEN)
     themes = get_groups_theme(vk, user_id)
     result.append("Тематики групп пользователя:")
     for theme in themes:
