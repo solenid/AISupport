@@ -2,6 +2,8 @@
 import requests
 
 from keras.src.backend.jax.core import switch
+from numpy.f2py.auxfuncs import throw_error
+from vk_api import ApiError
 
 import GetToken as gt
 from colorCHECK import colorCHECK
@@ -28,7 +30,36 @@ def get_posts_photo(user_id: str, token):
         'v': '5.131'  # Версия API
     }
     responseForWallGetById = requests.get(urlWallGetById, params=paramsForWallGetById)
-    dataForWallGetById = responseForWallGetById.json()
+    # try:
+    #     responseForWallGetById = requests.get(urlWallGetById, params=paramsForWallGetById)
+    #     print(responseForWallGetById)
+    #     if not(responseForWallGetById):
+    #         print('ERROR!')
+    #         raise Exception("ПРИШЁЛ ПУСТОЙ JSON-чик")
+    # except ApiError as e:
+    #     print(f"Ошибка VK API: {e}")
+    #
+    # except Exception:
+    #     print("!!!   ОШИБКА   !!!")
+    #     return []
+
+    try:
+        dataForWallGetById = responseForWallGetById.json()
+        if('error' in dataForWallGetById):
+            ERROR_MESSAGE = (f"""!!!   ОШИБКА С ПОЛУЧЕНИЕМ ДОСТУПА К ЗАПИСЯМ НА СТРАНИЦЕ ПОЛЬЗОВАТЕЛЯ   !!!
+            Внутренность dataForWallGetById: {dataForWallGetById} """)
+            raise Exception(ERROR_MESSAGE)
+    except ApiError as ex:
+        print(f"Ошибка VK API: {ex}")
+        print(ex)
+        return []
+    except Exception as ex:
+        print(ex)
+        return []
+
+
+    # return []
+
     for elements in dataForWallGetById['response']['items']:
         for element in elements['attachments']:  # Указываем параметр, который нас интересует в посте
             if('photo' in element):
@@ -150,43 +181,45 @@ def testLusher(x, countColor):
 
     # return testResult
 
-    # print("Вывод для наглядного просмотра")
-    #
-    # print("For Blue")
-    # InputDatasize = x.size
-    # counter = 0
-    # for i in predictionBlue:
-    #     if (counter < InputDatasize):
-    #         print_rgb(x[counter][0], x[counter][1], x[counter][2], i)
-    #         counter += 1
-    #
-    # print("For Yellow")
-    # InputDatasize = x.size
-    # counter = 0
-    # for i in predictionYellow:
-    #     if (counter < InputDatasize):
-    #         print_rgb(x[counter][0], x[counter][1], x[counter][2], i)
-    #         counter += 1
-    #
-    # print("For Green")
-    # InputDatasize = x.size
-    # counter = 0
-    # for i in predictionGreen:
-    #     if (counter < InputDatasize):
-    #         print_rgb(x[counter][0], x[counter][1], x[counter][2], i)
-    #         counter += 1
-    #
-    # print("For Red")
-    # InputDatasize = x.size
-    # counter = 0
-    # for i in predictionRed:
-    #     if (counter < InputDatasize):
-    #         print_rgb(x[counter][0], x[counter][1], x[counter][2], i)
-    #         counter += 1
+    print("Вывод для наглядного просмотра")
+
+    print("For Blue")
+    InputDatasize = x.size
+    counter = 0
+    for i in predictionBlue:
+        if (counter < InputDatasize):
+            print_rgb(x[counter][0], x[counter][1], x[counter][2], i)
+            counter += 1
+
+    print("For Yellow")
+    InputDatasize = x.size
+    counter = 0
+    for i in predictionYellow:
+        if (counter < InputDatasize):
+            print_rgb(x[counter][0], x[counter][1], x[counter][2], i)
+            counter += 1
+
+    print("For Green")
+    InputDatasize = x.size
+    counter = 0
+    for i in predictionGreen:
+        if (counter < InputDatasize):
+            print_rgb(x[counter][0], x[counter][1], x[counter][2], i)
+            counter += 1
+
+    print("For Red")
+    InputDatasize = x.size
+    counter = 0
+    for i in predictionRed:
+        if (counter < InputDatasize):
+            print_rgb(x[counter][0], x[counter][1], x[counter][2], i)
+            counter += 1
 
 
 def startTestLusher(user_id: str):
     result = get_posts_photo(user_id,TOKEN)
+    if(result == []):
+        return "Мы не смогли получить данные\nВозможно, пользователь, которого вы проверяете не даёт доступ к данным."
     print(result)
 
     countColor = {
@@ -199,7 +232,7 @@ def startTestLusher(user_id: str):
     # indexPhoto = 0
     for i in result[0]:
         print("New url => " + i)
-        testLusher(np.array(colorCHECK(i, 10)), countColor)
+        testLusher(np.array(colorCHECK(i, 30)), countColor)
         # string = ("Индекс поста: " + str(result[1][indexPhoto]) + "\nНейросеть определила, что в данной фотографии ")
         # testResult.append(string + testLusher(np.array(colorCHECK(i,3)),countColor))
         # indexPhoto+=1
