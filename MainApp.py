@@ -3,7 +3,7 @@ import re
 import requests
 from tkinter import scrolledtext, messagebox
 
-import users
+
 from GetInfoFromVK import get_info
 from GetToken import get_token
 import testLusher as tL
@@ -17,9 +17,11 @@ def analyze():
     input_text = extract_identifier(input_text)
     input_text = get_numeric_id(input_text, SERVICE_TOKEN)
     result = get_info(input_text, SERVICE_TOKEN, USER_TOKEN)
+
     # базовая инфа
-    resultMainInfoUser = users.GetBase(input_text)
-    result.append(resultMainInfoUser)
+    # resultMainInfoUser = users.GetBase(input_text)
+    # result.append(resultMainInfoUser)
+
     # базовая инфа
     # Тест Люшера
     resultTestLusher = tL.startTestLusher(input_text)
