@@ -14,14 +14,6 @@ import asyncio
 SERVICE_TOKEN = get_token()
 USER_TOKEN = ''
 
-def getID():
-    id_user = text_input.get("1.0", tk.END).strip()
-    id_user = extract_identifier(id_user)
-    id_user = get_numeric_id(id_user, SERVICE_TOKEN)
-
-
-#Эти функции принимают id и функцию вывода в табличку
-# и свой результат сразу кидают в функцию из аргументов
 #----------------------------------------------------------------------------------
 #Функция для запуска Анализа
 async def analyze(id_user, updateOutput1):
