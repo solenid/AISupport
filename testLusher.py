@@ -1,10 +1,7 @@
 # START
 import requests
-
-from keras.src.backend.jax.core import switch
-from numpy.f2py.auxfuncs import throw_error
-from vk_api import ApiError
-
+from vk_api import VkApiError
+import GetInfoFromVK as getinfo
 import GetToken as gt
 from colorCHECK import colorCHECK
 # import users
@@ -17,50 +14,17 @@ TOKEN = gt.get_token()
 
 def get_posts_photo(user_id: str, token):
     res_photos = [[],[]]
-    count_posts = 50
-    filter = "owner"
-    offset = 0
-    urlWallGetById = 'https://api.vk.com/method/wall.get'
-    paramsForWallGetById = {
-        'access_token': token,
-        'owner_id': f'{user_id}',
-        'offset': f'{offset}',
-        'count': f'{count_posts}',
-        'filter': f'{filter}',
-        'v': '5.131'  # Версия API
-    }
-    responseForWallGetById = requests.get(urlWallGetById, params=paramsForWallGetById)
-    # try:
-    #     responseForWallGetById = requests.get(urlWallGetById, params=paramsForWallGetById)
-    #     print(responseForWallGetById)
-    #     if not(responseForWallGetById):
-    #         print('ERROR!')
-    #         raise Exception("ПРИШЁЛ ПУСТОЙ JSON-чик")
-    # except ApiError as e:
-    #     print(f"Ошибка VK API: {e}")
-    #
-    # except Exception:
-    #     print("!!!   ОШИБКА   !!!")
-    #     return []
+    vk = getinfo.get_vk_session(TOKEN)
+    if vk is None:
+        exit()
 
     try:
-        dataForWallGetById = responseForWallGetById.json()
-        if('error' in dataForWallGetById):
-            ERROR_MESSAGE = (f"""!!!   ОШИБКА С ПОЛУЧЕНИЕМ ДОСТУПА К ЗАПИСЯМ НА СТРАНИЦЕ ПОЛЬЗОВАТЕЛЯ   !!!
-            Внутренность dataForWallGetById: {dataForWallGetById} """)
-            raise Exception(ERROR_MESSAGE)
-    except ApiError as ex:
-        print(f"Ошибка VK API: {ex}")
-        print(ex)
-        return []
-    except Exception as ex:
-        print(ex)
+        dataForWallGetById = vk.wall.get(owner_id=user_id, count=10, filter='owner', extended=0, offset=0)
+    except VkApiError as e:
+        print(f"Ошибка при получении постов: {e}")
         return []
 
-
-    # return []
-
-    for elements in dataForWallGetById['response']['items']:
+    for elements in dataForWallGetById['items']:
         for element in elements['attachments']:  # Указываем параметр, который нас интересует в посте
             if('photo' in element):
                 print(element['photo'])
@@ -137,30 +101,12 @@ def whatIsColorMean(indexLargeElement, countColor):
 
     if indexLargeElement == 1:
         countColor['yellow'] += 1
-        # return (
-        #     "Желтый доминирует\n"
-        #     "Это означает, что:\n"
-        #     "Желтый тип - общительный, отзывчивый человек. Им хорошо подходят широкие социальные контакты."
-        # )
 
     if indexLargeElement == 2:
         countColor['green'] += 1
-        # return (
-        #     "Зеленый доминирует\n"
-        #     "Это означает, что:\n"
-        #     "Зеленый тип - настойчивый, но робкий человек. Ему комфортно в условиях, которые дают ощущение значимости и достоинства."
-        # )
 
     if indexLargeElement == 3:
         countColor['red'] += 1
-        # return (
-        #     "Красный доминирует\n"
-        #     "Это означает, что:\n"
-        #     "Красный тип - энергичный человек. Такие люди чувствуют себя комфортно в активной деятельности."
-        # )
-
-    # return "Некорректный индекс цвета."
-
 
 
 def testLusher(x, countColor):
@@ -168,7 +114,6 @@ def testLusher(x, countColor):
     modelYellow = keras.models.load_model('AiModel/my_modelYELLOW.keras')
     modelGreen = keras.models.load_model('AiModel/my_modelGREEN.keras')
     modelRed = keras.models.load_model('AiModel/my_modelRED.keras')
-    # model.summary()
 
     predictionBlue = modelBlue.predict(x)
     predictionYellow = modelYellow.predict(x)
@@ -178,8 +123,6 @@ def testLusher(x, countColor):
     sumPrediction = [sum(predictionBlue), sum(predictionYellow), sum(predictionGreen), sum(predictionRed)]
     indexLargeElement = sumPrediction.index(max(sumPrediction))
     whatIsColorMean(indexLargeElement, countColor)
-
-    # return testResult
 
     print("Вывод для наглядного просмотра")
 
@@ -228,14 +171,9 @@ def startTestLusher(user_id: str):
         'yellow': 0,
         "green": 0
     }
-
-    # indexPhoto = 0
     for i in result[0]:
         print("New url => " + i)
         testLusher(np.array(colorCHECK(i, 30)), countColor)
-        # string = ("Индекс поста: " + str(result[1][indexPhoto]) + "\nНейросеть определила, что в данной фотографии ")
-        # testResult.append(string + testLusher(np.array(colorCHECK(i,3)),countColor))
-        # indexPhoto+=1
 
     mostPopularColor = (max(countColor, key=countColor.get))
 
@@ -243,19 +181,19 @@ def startTestLusher(user_id: str):
 
     match mostPopularColor:
         case 'yellow':
-            message = (" Самый часто используемый цвет на фото данного пользователя: ЖЕЛТЫЙ " +
+            message = (" Самый часто используемый цвет на фото данного пользователя: ЖЕЛТЫЙ \n" +
                        "Это значит что человек попадает под желтый тип" +
                        "\nЖелтый тип - общительный, отзывчивый человек.  Им хорошо подходят  широкие социальные контакты.")
         case 'blue':
-            message = (" Самый часто используемый цвет на фото данного пользователя: СИНИЙ " +
+            message = (" Самый часто используемый цвет на фото данного пользователя: СИНИЙ \n" +
                        "Это значит что человек попадает под синий тип" +
                        "\nСиний тип - спокойный и уверенный в себе человек. Таким людям важно чувствовать себя в безопасности, быть всегда защищенными.")
         case 'red':
-            message = (" Самый часто используемый цвет на фото данного пользователя: КРАСНЫЙ " +
+            message = (" Самый часто используемый цвет на фото данного пользователя: КРАСНЫЙ \n" +
                        "Это значит что человек попадает под желтый тип" +
                        "\nКрасный тип - энергичный человек. Такие люди чувствует себя комфортно в активной деятельности.")
         case 'green':
-            message = (" Самый часто используемый цвет на фото данного пользователя: ЗЕЛЁНЫЙ " +
+            message = (" Самый часто используемый цвет на фото данного пользователя: ЗЕЛЁНЫЙ \n" +
                        "Это значит что человек попадает под желтый тип" +
                        "\nЗеленый тип - настойчивый, но робкий человек. Ему комфортно в условиях, которые дают ощущение значимости и достоинства.")
     return message

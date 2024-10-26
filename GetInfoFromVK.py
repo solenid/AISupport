@@ -89,6 +89,7 @@ def get_info(user_id: str, SERVICE_TOKEN, USER_TOKEN):
     vk = get_vk_session(SERVICE_TOKEN)
     if vk is None:
         exit()
+
     base = GetBase(vk, user_id)
     for res in base:
         result.append(res)
