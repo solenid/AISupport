@@ -93,11 +93,6 @@ def print_rgb(r, g, b, text):
 def whatIsColorMean(indexLargeElement, countColor):
     if indexLargeElement == 0:
         countColor['blue']+=1
-        # return (
-        #     "Синий и его оттенки доминируют"
-        #     "Это означает, что:\n"
-        #     "Синий тип - спокойный и уверенный в себе человек. Таким людям важно чувствовать себя в безопасности, быть всегда защищенными."
-        # )
 
     if indexLargeElement == 1:
         countColor['yellow'] += 1
@@ -162,7 +157,7 @@ def testLusher(x, countColor):
 def startTestLusher(user_id: str):
     result = get_posts_photo(user_id,TOKEN)
     if(result == []):
-        return "Мы не смогли получить данные\nВозможно, пользователь, которого вы проверяете не даёт доступ к данным."
+        return "Мы не смогли получить данные\nВозможно, пользователь, которого вы проверяете, не даёт доступ к данным."
     print(result)
 
     countColor = {
@@ -173,7 +168,7 @@ def startTestLusher(user_id: str):
     }
     for i in result[0]:
         print("New url => " + i)
-        testLusher(np.array(colorCHECK(i, 30)), countColor)
+        testLusher(np.array(colorCHECK(i, 20)), countColor)
 
     mostPopularColor = (max(countColor, key=countColor.get))
 
@@ -190,10 +185,10 @@ def startTestLusher(user_id: str):
                        "\nСиний тип - спокойный и уверенный в себе человек. Таким людям важно чувствовать себя в безопасности, быть всегда защищенными.")
         case 'red':
             message = (" Самый часто используемый цвет на фото данного пользователя: КРАСНЫЙ \n" +
-                       "Это значит что человек попадает под желтый тип" +
+                       "Это значит что человек попадает под красный тип" +
                        "\nКрасный тип - энергичный человек. Такие люди чувствует себя комфортно в активной деятельности.")
         case 'green':
             message = (" Самый часто используемый цвет на фото данного пользователя: ЗЕЛЁНЫЙ \n" +
-                       "Это значит что человек попадает под желтый тип" +
+                       "Это значит что человек попадает под зелёный тип" +
                        "\nЗеленый тип - настойчивый, но робкий человек. Ему комфортно в условиях, которые дают ощущение значимости и достоинства.")
     return message
