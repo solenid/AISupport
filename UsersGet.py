@@ -4,7 +4,6 @@ def GetBase(vk, USER_ID):
     fields = 'status, bdate, universities, interests, schools'
     try:
         response = vk.users.get(user_ids=USER_ID, fields=fields)
-        # print (response)
         # Если ответ получен и Если ответ не пуст
         if (len(response) != 0):
             result.append(f"Имя: {response[0]['first_name']} {response[0]['last_name']}")
