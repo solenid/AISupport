@@ -56,6 +56,7 @@ def get_publics_theme(vk, user_id):
 
 
 def get_groups_theme(vk, user_id):
+    dictionaryThemes = {}
     themes = set()
     offset = 0
     count = 1000
@@ -78,9 +79,16 @@ def get_groups_theme(vk, user_id):
         for group in groups:
             activity = group.get('activity')
             if activity:
-                themes.add(activity)
+                if activity in dictionaryThemes:
+                    dictionaryThemes[f'{activity}'] += 1
+                else:
+                    dictionaryThemes[f'{activity}'] = 1
+                # themes.add(activity)
         offset += count
-    return list(themes)
+    sorted_dict = {key: value for key,
+    value in sorted(dictionaryThemes.items(),
+                    key=lambda item: item[1], reverse=True)}
+    return list(sorted_dict.keys())
 
 
 def get_info(user_id: str, SERVICE_TOKEN, USER_TOKEN):
@@ -89,6 +97,7 @@ def get_info(user_id: str, SERVICE_TOKEN, USER_TOKEN):
     vk = get_vk_session(SERVICE_TOKEN)
     if vk is None:
         exit()
+
     base = GetBase(vk, user_id)
     for res in base:
         result.append(res)
@@ -142,8 +151,8 @@ def get_info(user_id: str, SERVICE_TOKEN, USER_TOKEN):
             result.append(f"Общее кол-во слов в постах: 0")
     # 9. Тематики групп пользователя
     vk = get_vk_session(USER_TOKEN)
-    themes = get_groups_theme(vk, user_id)
-    result.append("Тематики групп пользователя:")
+    themes = get_groups_theme(vk, user_id)[:4]
+    result.append("Топ 5 тематик групп пользователя:")
     for theme in themes:
         result.append(f"- {theme}")
     result.append("--- %s секунд на анализ профиля ---" % (int(time.time() - start_time)))
