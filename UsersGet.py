@@ -21,12 +21,13 @@ def GetBase(vk, USER_ID):
                     result.append(f"- {school['name']}")
             # Если указан университет
             if ('universities' in response[0]):
-                result.append(f"Университет: {response[0]['universities'][0]['name']} \n")
-                if 'faculty_name' in response[0]['universities']:
-                    if 'chair_name' in response[0]['universities']:
-                        result.append(f"{response[0]['universities'][0]['faculty_name']} - {response[0]['universities'][0]['chair_name']}")
-                    else:
-                        result.append(f"{response[0]['universities'][0]['faculty_name']}")
+                if (len(response[0]['universities']) != 0):
+                    result.append(f"Университет: {response[0]['universities'][0]['name']} \n")
+                    if 'faculty_name' in response[0]['universities']:
+                        if 'chair_name' in response[0]['universities']:
+                            result.append(f"{response[0]['universities'][0]['faculty_name']} - {response[0]['universities'][0]['chair_name']}")
+                        else:
+                            result.append(f"{response[0]['universities'][0]['faculty_name']}")
         else:
             print(response)
     except VkApiError as e:
