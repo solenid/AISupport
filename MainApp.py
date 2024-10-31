@@ -14,6 +14,8 @@ import asyncio
 SERVICE_TOKEN = get_token()
 USER_TOKEN = ''
 
+#Эти функции принимают id и функцию вывода в табличку
+# и свой результат сразу кидают в функцию из аргументов
 #----------------------------------------------------------------------------------
 #Функция для запуска Анализа
 async def analyze(id_user, updateOutput1):
@@ -96,7 +98,6 @@ root = tk.Tk()
 root.title("AI_HELPER")
 root.geometry("800x600")
 root.title("Авторизация через VK ID")
-root.minsize(800, 500)
 
 title_label = tk.Label(root, text="АВТОРИЗУЙТЕСЬ В СЕРВИСЕ С ПОМОЩЬЮ VK ID", font=("Arial", 14))
 title_label.pack(pady=10)
