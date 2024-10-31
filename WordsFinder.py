@@ -33,7 +33,7 @@ def predict_profanity_forbidden(texts):
 
 def count_extremism_words(text: str) -> int:
     try:
-        with open("extremism_words_file.txt", 'r', encoding='utf-8') as file:
+        with open("dictionaries/extremism_words_file.txt", 'r', encoding='utf-8') as file:
             forbidden_words = [line.strip().lower() for line in file if line.strip()]
         translator = str.maketrans('', '', string.punctuation)
         text_clean = text.translate(translator).lower()
@@ -50,7 +50,7 @@ def count_extremism_words(text: str) -> int:
 
 def count_threat_words(text: str) -> int:
     try:
-        with open("threat_words_file.txt", 'r', encoding='utf-8') as file:
+        with open("dictionaries/threat_words_file.txt", 'r', encoding='utf-8') as file:
             forbidden_words = [line.strip().lower() for line in file if line.strip()]
         translator = str.maketrans('', '', string.punctuation)
         text_clean = text.translate(translator).lower()

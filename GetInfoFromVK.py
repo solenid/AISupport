@@ -131,7 +131,7 @@ def get_info(user_id: str, SERVICE_TOKEN, USER_TOKEN):
             # 6. Количество матерных слов в постах
             total_forbidden_count = 0
 
-            forbidden_words_search(posts_text, total_forbidden_count)
+            total_forbidden_count = forbidden_words_search(posts_text, total_forbidden_count)
             result.append(f"Общее кол-во матерных слов в постах: {total_forbidden_count}")
 
             # 7. Количество экстремистких слов в постах
