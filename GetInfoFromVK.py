@@ -63,7 +63,7 @@ def get_criteria_grade(score):
 
 def get_groups_theme(vk, user_id):
     dictionaryThemes = {}
-    themes = set()
+    garbageThemesKeyWords = ["заблокирован", "закрытое сообщество"]
     offset = 0
     count = 1000
     while True:
@@ -83,13 +83,17 @@ def get_groups_theme(vk, user_id):
         if not groups:
             break
         for group in groups:
+            flag = False
             activity = group.get('activity')
             if activity:
-                if activity in dictionaryThemes:
+                for elem in garbageThemesKeyWords:
+                    if elem in activity.lower():
+                        flag = True
+                if activity in dictionaryThemes and not flag:
                     dictionaryThemes[f'{activity}'] += 1
                 else:
-                    dictionaryThemes[f'{activity}'] = 1
-                # themes.add(activity)
+                    if not flag:
+                        dictionaryThemes[f'{activity}'] = 1
         offset += count
     sorted_dict = {key: value for key,
     value in sorted(dictionaryThemes.items(),
@@ -233,7 +237,7 @@ def get_info(user_id: str, SERVICE_TOKEN, USER_TOKEN):
             criteriaLiter = -1
     # 9. Тематики групп пользователя
     vk = get_vk_session(USER_TOKEN)
-    themes = get_groups_theme(vk, user_id)[:4]
+    themes = get_groups_theme(vk, user_id)[:5]
     result.append("Топ 5 тематик групп пользователя:")
     for theme in themes:
         result.append(f"- {theme}")
