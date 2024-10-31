@@ -42,24 +42,33 @@ def get_numeric_id(user_identifier, access_token, api_version='5.131'):
               'v': api_version}
     response = requests.get(url, params=params)
     data = response.json()
+    print(data)
     return str(data['response'][0]['id'])
 
 def on_authorize():
     global USER_TOKEN
-    USER_TOKEN = user_authorization()
-    if USER_TOKEN == '':
-        messagebox.showerror("Ошибка", "Не удалось авторизоваться")
-        return
-    authorize_button.pack_forget()
-    title_label.config(text="Введите ссылку на профиль")
-    label_input.pack(pady=10)
-    text_input.pack(padx=10)
-    button.pack(pady=10)
-    label_output.pack(pady=10,side='left')
-    label_output2.pack(pady=10, side='right')
-    text_output.pack(pady=15, side='left')
-    text_output2.pack(pady=15, side='right')
+    if USER_TOKEN != '':
+        authorize_button.pack_forget()
+        button_analyze.pack(anchor='nw')
+        button_history.pack(anchor='nw')
+        title_label.config(text="Введите ссылку на профиль")
+        label_input.pack(pady=10)
+        text_input.pack(padx=10)
+        button.pack(pady=10)
+        label_output.pack(pady=10, side='left')
+        label_output2.pack(pady=10, side='right')
+        text_output.pack(pady=15, side='left')
+        text_output2.pack(pady=15, side='right')
+    else:
+        USER_TOKEN = user_authorization()
+        if USER_TOKEN == '':
+            messagebox.showerror("Ошибка", "Не удалось авторизоваться")
+            return
+        on_authorize()
 
+def on_history():
+    title_label.config(text="История последних 10 запросов")
+    
 
 #Вычисляет id пользовтеля и тут же начинает бесконечный цикл ожидания завершения функций
 #Вероятно нужно придумать как блокировать кнопку при едином ее нажатии
@@ -105,6 +114,8 @@ title_label.pack(pady=10)
 authorize_button = tk.Button(root, text="Авторизоваться", command=on_authorize)
 authorize_button.pack(pady=5)
 
+button_analyze = tk.Button(root, text="Анализ", width=6, height=1, command=on_authorize)
+button_history = tk.Button(root, text="История", width=6, height=1, command=on_history)
 label_input = tk.Label(root, text="Введите id:")
 text_input = scrolledtext.ScrolledText(root, width=60, height=10)
 button = tk.Button(root, text="Выполнить анализ", command=onTap)
