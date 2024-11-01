@@ -34,61 +34,9 @@ def getPostsPhoto(userID: str, token):
                 resPhotos[1].append(photoId)
     return resPhotos
 
-
-def userGetInfo(user_id: str, token, choice):
-    count_posts = 50
-    filter = "owner"
-    offset = 0
-    urlWallGetById = 'https://api.vk.com/method/wall.get'
-    paramsForWallGetById = {
-        'access_token': token,
-        'owner_id': f'{user_id}',
-        'offset': f'{offset}',
-        'count': f'{count_posts}',
-        'filter': f'{filter}',
-        'v': '5.131'  # Версия API
-    }
-    responseForWallGetById = requests.get(urlWallGetById, params=paramsForWallGetById)
-    dataForWallGetById = responseForWallGetById.json()
-    if (choice == "text"):
-        print(f"Проверка на {choice}")
-        for elements in dataForWallGetById['response']['items']:
-            if (elements['text'] != ""):
-                print("--------------------------------------")
-                print(f"id => {elements['id']}")
-                print(elements['text'])
-                print("--------------------------------------\n")
-            else:
-                print("--------------------------------------")
-                print(f"id => {elements['id']}")
-                print("Текста нет")
-                print("--------------------------------------\n")
-
-    if (choice == "photo"):
-        print(f"Проверка на {choice}")
-        for elements in dataForWallGetById['response']['items']:
-            for element in elements['attachments']:  # Указываем параметр, который нас интересует в посте
-                photo = element['photo']['orig_photo']
-                # print(photo)
-                if (photo['url'] != ""):
-                    print("--------------------------------------")
-                    print(f"id => {elements['id']}")
-                    print(f"Size original photo: {photo['width']}x{photo['height']}")
-                    print(f"Type => {element['type']}")
-                    print(f"Photo url => {photo['url']}")
-                    print("--------------------------------------\n")
-
-                else:
-                    print("--------------------------------------")
-                    print(f"id => {elements['id']}")
-                    print("фото нет")
-                    print("--------------------------------------\n")
-
-
 # Функция для установки цвета текста с использованием ANSI escape codes
 def print_rgb(r, g, b, text):
     print(f"\033[38;2;{r};{g};{b}m{text}\033[0m")
-
 
 def whatIsColorMean(indexLargeElement, countColor):
     if indexLargeElement == 0:

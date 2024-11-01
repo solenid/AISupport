@@ -168,7 +168,7 @@ def getInfoFromVK(userID: str, serviceToken, userToken):
                     errCount += len(errors)
             #!Если есть текст в постах СНОВА????????
             if (totalWords) > 0:
-                result.append(f"Общее кол-во ошибок в постах за год : {errCount}")
+                result.append(f"Общее кол-во постов за год, содержащие грамматические ошибки : {errCount}")
                 #Оценка грамотности (точности)
                 if (errCount) != 0:
                     if errCount/totalWords < 0.1:
