@@ -63,7 +63,8 @@ def get_criteria_grade(score):
 
 def get_groups_theme(vk, user_id):
     dictionaryThemes = {}
-    garbageThemesKeyWords = ["заблокирован", "закрытое сообщество"]
+    garbageThemesKeyWords = ["заблокирован", "закрытое", "закрытый", "недоступный", "недоступно"] # Здесь добавляем
+                                                                        # ключевые слова ненужных нам тем (строчными)
     offset = 0
     count = 1000
     while True:
@@ -83,17 +84,12 @@ def get_groups_theme(vk, user_id):
         if not groups:
             break
         for group in groups:
-            flag = False
             activity = group.get('activity')
-            if activity:
-                for elem in garbageThemesKeyWords:
-                    if elem in activity.lower():
-                        flag = True
-                if activity in dictionaryThemes and not flag:
+            if activity and not any(keyword in activity.lower() for keyword in garbageThemesKeyWords):
+                if activity in dictionaryThemes:
                     dictionaryThemes[f'{activity}'] += 1
                 else:
-                    if not flag:
-                        dictionaryThemes[f'{activity}'] = 1
+                    dictionaryThemes[f'{activity}'] = 1
         offset += count
     sorted_dict = {key: value for key,
     value in sorted(dictionaryThemes.items(),
