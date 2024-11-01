@@ -3,7 +3,7 @@ import requests
 from vk_api import VkApiError
 import GetInfoFromVK as getinfo
 import GetToken as gt
-from colorCHECK import colorCHECK
+from СolorCheck import colorCHECK
 # import users
 import numpy as np
 from tensorflow import keras

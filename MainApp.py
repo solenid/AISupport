@@ -5,8 +5,8 @@ from tkinter import scrolledtext, messagebox
 
 from GetInfoFromVK import get_info
 from GetToken import get_token
-import testLusher as tL
-from Authorization import user_authorization
+import TestLusher as tL
+from Authorization import userAuthorization
 #Для асинхронности
 import threading
 import asyncio
@@ -46,7 +46,7 @@ def get_numeric_id(user_identifier, access_token, api_version='5.131'):
 
 def on_authorize():
     global USER_TOKEN
-    USER_TOKEN = user_authorization()
+    USER_TOKEN = userAuthorization()
     if USER_TOKEN == '':
         messagebox.showerror("Ошибка", "Не удалось авторизоваться")
         return
