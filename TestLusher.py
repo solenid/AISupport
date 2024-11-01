@@ -14,7 +14,7 @@ TOKEN = gt.get_token()
 
 def get_posts_photo(user_id: str, token):
     res_photos = [[],[]]
-    vk = getinfo.get_vk_session(TOKEN)
+    vk = getinfo.getVKSession(TOKEN)
     if vk is None:
         exit()
 

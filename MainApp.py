@@ -3,7 +3,7 @@ import re
 import requests
 from tkinter import scrolledtext, messagebox
 
-from GetInfoFromVK import get_info
+from GetInfoFromVK import getInfoFromVK
 from GetToken import get_token
 import TestLusher as tL
 from Authorization import userAuthorization
@@ -19,7 +19,7 @@ USER_TOKEN = ''
 #----------------------------------------------------------------------------------
 #Функция для запуска Анализа
 async def analyze(id_user, updateOutput1):
-    updateOutput1 (get_info(id_user, SERVICE_TOKEN, USER_TOKEN))
+    updateOutput1 (getInfoFromVK(id_user, SERVICE_TOKEN, USER_TOKEN))
 
 #Функция для запуска теста Люшера
 async def lysher(id_user, updateOutput2):

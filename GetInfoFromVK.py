@@ -9,48 +9,42 @@ from UsersGet import *
 TOKEN = get_token()
 
 
-def get_vk_session(token):
+def getVKSession(token):
     try:
-        vk_session = vk_api.VkApi(token=token)
-        vk = vk_session.get_api()
+        vkSession = vk_api.VkApi(token=token)
+        vk = vkSession.get_api()
         return vk
     except VkApiError as e:
         print(f"Ошибка при подключении к VK API: {e}")
         return None
 
 
-def get_number_of_friends(vk, user_id):
+def getNumberOfFriends(vk, userID):
     try:
-        response = vk.friends.get(user_id=user_id, count=0)
+        response = vk.friends.get(user_id=userID, count=0)
         return response['count']
     except VkApiError as e:
         print(f"Ошибка при получении друзей: {e}")
         return None
 
+def getTotalComments(posts):
+    return sum(post.get('comments', {}).get('count', 0) for post in posts)
 
-def get_total_comments(posts):
-    total_comments = sum(post.get('comments', {}).get('count', 0) for post in posts)
-    return total_comments
+def getTotalLikes(posts):
+    return sum(post.get('likes', {}).get('count', 0) for post in posts)
 
+def getPostsText(posts):
+    return [post.get('text', '') for post in posts]
 
-def get_total_likes(posts):
-    total_likes = sum(post.get('likes', {}).get('count', 0) for post in posts)
-    return total_likes
-
-
-def get_posts_text(posts):
-    posts_text = [post.get('text', '') for post in posts]
-    return posts_text
-
-def get_publics_theme(vk, user_id):
+def getPublicsTheme(vk, userID):
     try:
-        response = vk.groups.get(user_id=user_id, count=0)
+        response = vk.groups.get(user_id=userID, count=0)
         return response['count']
     except VkApiError as e:
         print(f"Ошибка при получении групп: {e}")
         return None
 
-def get_criteria_grade(score):
+def getCriteriaGrade(score):
     result = "Низкая"
     if score > 2:
         if score > 4:
@@ -61,7 +55,7 @@ def get_criteria_grade(score):
         result = "Не определено" #\n(веротяно нет постов или слов в них)"
     return result
 
-def get_groups_theme(vk, user_id):
+def getGroupsTheme(vk, userID):
     dictionaryThemes = {}
     garbageThemesKeyWords = ["заблокирован", "закрытое", "закрытый", "недоступный", "недоступно"] # Здесь добавляем
                                                                         # ключевые слова ненужных нам тем (строчными)
@@ -70,7 +64,7 @@ def get_groups_theme(vk, user_id):
     while True:
         try:
             response = vk.groups.get(
-                user_id=user_id,
+                user_id=userID,
                 extended=1,
                 fields='activity',
                 offset=offset,
@@ -79,7 +73,6 @@ def get_groups_theme(vk, user_id):
         except VkApiError as error:
             print(f"Ошибка при получении групп: {error}")
             break
-
         groups = response.get('items', [])
         if not groups:
             break
@@ -97,7 +90,7 @@ def get_groups_theme(vk, user_id):
     return list(sorted_dict.keys())
 
 
-def get_info(user_id: str, SERVICE_TOKEN, USER_TOKEN):
+def getInfoFromVK(userID: str, serviceToken, userToken):
 
     # Флаги оценок
     criteriaCommun = 0 # Общительность
@@ -106,29 +99,29 @@ def get_info(user_id: str, SERVICE_TOKEN, USER_TOKEN):
     criteriaActivity = 0 # Активность
     criteriaRedFlag = 0 # Ред флаги
 
-    result = [f"Используемый user_id: {user_id}"]
-    start_time = time.time()
-    vk = get_vk_session(SERVICE_TOKEN)
+    result = [f"Используемый user_id: {userID}"]
+    startTime = time.time()
+    vk = getVKSession(serviceToken)
     if vk is None:
         exit()
 
-    base = GetBase(vk, user_id)
+    base = GetBase(vk, userID)
     for res in base:
         result.append(res)
     # 1. Количество друзей
-    number_of_friends = get_number_of_friends(vk, user_id)
-    if number_of_friends is not None:
-        result.append(f"Количество друзей пользователя: {number_of_friends}")
+    friendsNum = getNumberOfFriends(vk, userID)
+    if friendsNum is not None:
+        result.append(f"Количество друзей пользователя: {friendsNum}")
         #Оценка общительности
-        if number_of_friends > 100:
-            if number_of_friends > 200:
+        if friendsNum > 100:
+            if friendsNum > 200:
                 criteriaCommun += 2
             else:
                 criteriaCommun += 1
 
 
     # 2. Получение кол-ва постов за год
-    posts = get_posts_for_last_year(vk, user_id)
+    posts = get_posts_for_last_year(vk, userID)
     numPosts = len(posts)
     result.append(f"Всего постов за год: {numPosts}")
     if numPosts > 0:
@@ -141,84 +134,84 @@ def get_info(user_id: str, SERVICE_TOKEN, USER_TOKEN):
                 criteriaActivity = 4
 
         # 3. Общее количество комментариев за год
-        total_comments = get_total_comments(posts)
-        result.append(f"Общее количество комментариев за год: {total_comments}")
+        totalComments = getTotalComments(posts)
+        result.append(f"Общее количество комментариев за год: {totalComments}")
 
         # Оценка общительности
-        if total_comments > (number_of_friends*(0.2)):
-            if total_comments > (number_of_friends*(0.5)):
+        if totalComments > (friendsNum*(0.2)):
+            if totalComments > (friendsNum*(0.5)):
                 criteriaCommun += 2
             else:
                 criteriaCommun += 1
 
         # 4. Общее количество лайков за год
-        total_likes = get_total_likes(posts)
-        result.append(f"Общее количество лайков за год: {total_likes}")
+        totalLikes = getTotalLikes(posts)
+        result.append(f"Общее количество лайков за год: {totalLikes}")
 
         # Оценка общительности
-        if total_likes > (number_of_friends*(0.50)):
-            if total_likes > (number_of_friends*(0.75)):
+        if totalLikes > (friendsNum*(0.50)):
+            if totalLikes > (friendsNum*(0.75)):
                 criteriaCommun += 2
             else:
                 criteriaCommun += 1
 
         #!Если есть текст в постах
-        posts_text = get_posts_text(posts)
-        if posts_text:
+        postsText = getPostsText(posts)
+        if postsText:
             # 5. Тексты постов за год и проверка на ошибки
-            errors_counts = 0
-            total_words = 0
-            for idx, text in enumerate(posts_text, 1):
-                total_words += len(text.split())
-                errors = check_spelling(text)
+            errCount = 0
+            totalWords = 0
+            for idx, text in enumerate(postsText, 1):
+                totalWords += len(text.split())
+                errors = checkSpelling(text)
                 if errors:
-                    errors_counts += len(errors)
+                    errCount += len(errors)
             #!Если есть текст в постах СНОВА????????
-            if (total_words) > 0:
-                result.append(f"Общее кол-во ошибок в постах за год : {errors_counts}")
+            if (totalWords) > 0:
+                result.append(f"Общее кол-во ошибок в постах за год : {errCount}")
                 #Оценка грамотности (точности)
-                if (errors_counts) != 0:
-                    if errors_counts/total_words < 0.1:
+                if (errCount) != 0:
+                    if errCount/totalWords < 0.1:
                         criteriaLiter = 4
                 else:
                     criteriaLiter = 6
 
 
                 # 6. Количество матерных постов
-                total_forbidden_count = 0
-                total_forbidden_count = forbidden_words_search(posts_text, total_forbidden_count)
-                result.append(f"Общее кол-во матерных постов: {total_forbidden_count}")
+                totalForbiddenCount = 0
+                totalForbiddenCount = forbidden_words_search(postsText, totalForbiddenCount)
+                result.append(f"Общее кол-во матерных постов: {totalForbiddenCount}")
 
                 #Оценка дивиации
-                if total_forbidden_count/numPosts > 0.15:
-                    if total_forbidden_count/numPosts > 0.25:
+                if totalForbiddenCount/numPosts > 0.15:
+                    if totalForbiddenCount/numPosts > 0.25:
                         criteriaRedFlag += 2
                     else:
                         criteriaRedFlag += 1
 
                 # 7. Количество экстремистких слов в постах
-                total_forbidden_count = 0
-                for text in posts_text:
+                totalForbiddenCount = 0
+                for text in postsText:
                     forbiddenCount = count_extremism_words(text)
-                    total_forbidden_count += forbiddenCount
-                result.append(f"Общее кол-во экстремистких слов в постах: {total_forbidden_count}")
+                    totalForbiddenCount += forbiddenCount
+                result.append(f"Общее кол-во экстремистких слов в постах: {totalForbiddenCount}")
 
                 # Оценка дивиации
-                if total_forbidden_count / total_words > 0.05:
-                    if total_forbidden_count / total_words > 0.15:
+                if totalForbiddenCount / totalWords > 0.05:
+                    if totalForbiddenCount / totalWords > 0.15:
                         criteriaRedFlag += 2
                     else:
                         criteriaRedFlag += 1
 
                 # 8. Количество слов-угроз в постах
-                total_forbidden_count = 0
-                for text in posts_text:
+                totalForbiddenCount = 0
+                for text in postsText:
                     forbiddenCount = count_threat_words(text)
-                    total_forbidden_count += forbiddenCount
-                result.append(f"Общее кол-во слов-угроз в постах: {total_forbidden_count}")
+                    totalForbiddenCount += forbiddenCount
+                result.append(f"Общее кол-во слов-угроз в постах: {totalForbiddenCount}")
                 # Оценка дивиации
-                if total_forbidden_count / total_words > 0.05:
-                    if total_forbidden_count / total_words > 0.15:
+                if totalForbiddenCount / totalWords > 0.05:
+                    if totalForbiddenCount / totalWords > 0.15:
                         criteriaRedFlag += 2
                     else:
                         criteriaRedFlag += 1
@@ -231,18 +224,21 @@ def get_info(user_id: str, SERVICE_TOKEN, USER_TOKEN):
             result.append(f"Общее кол-во слов в постах: 0")
             criteriaRedFlag = -1
             criteriaLiter = -1
+    else:
+        criteriaRedFlag = -1
+        criteriaLiter = -1
     # 9. Тематики групп пользователя
-    vk = get_vk_session(USER_TOKEN)
-    themes = get_groups_theme(vk, user_id)[:5]
+    vk = getVKSession(userToken)
+    themes = getGroupsTheme(vk, userID)[:5]
     result.append("Топ 5 тематик групп пользователя:")
     for theme in themes:
         result.append(f"- {theme}")
 
     #10 ОЦЕНКА пользователя
-    result.append(f"Общительность: {get_criteria_grade(criteriaCommun)}")
-    result.append(f"Грамотность: {get_criteria_grade(criteriaLiter)}")
-    result.append(f"Активность: {get_criteria_grade(criteriaActivity)}")
-    result.append(f"Степень дивиации: {get_criteria_grade(criteriaRedFlag)}")
+    result.append(f"Общительность: {getCriteriaGrade(criteriaCommun)}")
+    result.append(f"Грамотность: {getCriteriaGrade(criteriaLiter)}")
+    result.append(f"Активность: {getCriteriaGrade(criteriaActivity)}")
+    result.append(f"Степень дивиации: {getCriteriaGrade(criteriaRedFlag)}")
 
-    result.append("--- %s секунд на анализ профиля ---" % (int(time.time() - start_time)))
+    result.append("--- %s секунд на анализ профиля ---" % (int(time.time() - startTime)))
     return result
