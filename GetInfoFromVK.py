@@ -6,7 +6,7 @@ from GetPosts import *
 from GetToken import *
 from UsersGet import *
 
-TOKEN = get_token()
+TOKEN = getToken()
 
 
 def getVKSession(token):
@@ -57,6 +57,8 @@ def getCriteriaGrade(score):
 
 def getGroupsTheme(vk, userID):
     dictionaryThemes = {}
+    garbageThemesKeyWords = ["заблокирован", "закрытое", "закрытый", "недоступный", "недоступно"] # Здесь добавляем
+                                                                        # ключевые слова ненужных нам тем (строчными)
     offset = 0
     count = 1000
     while True:
@@ -76,16 +78,16 @@ def getGroupsTheme(vk, userID):
             break
         for group in groups:
             activity = group.get('activity')
-            if activity:
+            if activity and not any(keyword in activity.lower() for keyword in garbageThemesKeyWords):
                 if activity in dictionaryThemes:
                     dictionaryThemes[f'{activity}'] += 1
                 else:
                     dictionaryThemes[f'{activity}'] = 1
         offset += count
-    sorted_dict = {key: value for key,
+    sortedDict = {key: value for key,
     value in sorted(dictionaryThemes.items(),
                     key=lambda item: item[1], reverse=True)}
-    return list(sorted_dict.keys())
+    return list(sortedDict.keys())
 
 
 def getInfoFromVK(userID: str, serviceToken, userToken):
@@ -119,7 +121,7 @@ def getInfoFromVK(userID: str, serviceToken, userToken):
 
 
     # 2. Получение кол-ва постов за год
-    posts = get_posts_for_last_year(vk, userID)
+    posts = getPostsForLastYear(vk, userID)
     numPosts = len(posts)
     result.append(f"Всего постов за год: {numPosts}")
     if numPosts > 0:
@@ -177,7 +179,7 @@ def getInfoFromVK(userID: str, serviceToken, userToken):
 
                 # 6. Количество матерных постов
                 totalForbiddenCount = 0
-                totalForbiddenCount = forbidden_words_search(postsText, totalForbiddenCount)
+                totalForbiddenCount = forbiddenWordsSearch(postsText, totalForbiddenCount)
                 result.append(f"Общее кол-во матерных постов: {totalForbiddenCount}")
 
                 #Оценка дивиации
@@ -204,7 +206,7 @@ def getInfoFromVK(userID: str, serviceToken, userToken):
                 # 8. Количество слов-угроз в постах
                 totalForbiddenCount = 0
                 for text in postsText:
-                    forbiddenCount = count_threat_words(text)
+                    forbiddenCount = countThreatWords(text)
                     totalForbiddenCount += forbiddenCount
                 result.append(f"Общее кол-во слов-угроз в постах: {totalForbiddenCount}")
                 # Оценка дивиации
