@@ -3,86 +3,81 @@ import re
 import requests
 from tkinter import scrolledtext, messagebox
 
+from GetInfoFromVK import getInfoFromVK
+from GetToken import getToken
+import TestLusher as tL
+from Authorization import userAuthorization
 from GetInfoFromVK import get_info
 from GetToken import get_token
-import testLusher as tL
 from Authorization import user_authorization
 from DataBaseInterface import *
 #Для асинхронности
 import threading
 import asyncio
 
-SERVICE_TOKEN = get_token()
-USER_TOKEN = ''
+serviceToken = getToken()
+userToken = ''
 
 #Эти функции принимают id и функцию вывода в табличку
 # и свой результат сразу кидают в функцию из аргументов
 #----------------------------------------------------------------------------------
 #Функция для запуска Анализа
-async def analyze(id_user, updateOutput1):
-    updateOutput1 (get_info(id_user, SERVICE_TOKEN, USER_TOKEN))
+async def analyze(IDuser, updateOutput1):
+    updateOutput1 (getInfoFromVK(IDuser, serviceToken, userToken))
 
 #Функция для запуска теста Люшера
-async def lysher(id_user, updateOutput2):
-    updateOutput2(tL.startTestLusher(id_user))
+async def lysher(IDuser, updateOutput2):
+    updateOutput2(tL.startTestLusher(IDuser))
 # ----------------------------------------------------------------------------------
 
-def extract_identifier(vk_url):
+def extractIdentifier(vkURL):
     pattern = r'https?://(?:www\.)?vk\.com/([^/?#&]+)'
-    match = re.match(pattern, vk_url)
+    match = re.match(pattern, vkURL)
     if match:
         return match.group(1)
     else:
         return None
 
 
-def get_numeric_id(user_identifier, access_token, api_version='5.131'):
+def getNumericID(userIdentifier, accessToken, apiVersion='5.131'):
     url = 'https://api.vk.com/method/users.get'
-    params = {'user_ids': user_identifier,
-              'access_token': access_token,
-              'v': api_version}
+    params = {'user_ids': userIdentifier,
+              'access_token': accessToken,
+              'v': apiVersion}
     response = requests.get(url, params=params)
     data = response.json()
     #print(data)
     return str(data['response'][0]['id'])
 
-def on_authorize():
-    global USER_TOKEN
-    if USER_TOKEN != '':
-        authorize_button.pack_forget()
-        button_analyze.pack(anchor='nw')
-        button_history.pack(anchor='nw')
-        title_label.config(text="Введите ссылку на профиль")
-        label_input.pack(pady=10)
-        text_input.pack(padx=10)
-        button.pack(pady=10)
-        label_output.pack(pady=10, side='left')
-        label_output2.pack(pady=10, side='right')
-        text_output.pack(pady=15, side='left')
-        text_output2.pack(pady=15, side='right')
-    else:
-        USER_TOKEN = user_authorization()
-        if USER_TOKEN == '':
-            messagebox.showerror("Ошибка", "Не удалось авторизоваться")
-            return
-        on_authorize()
-
-def on_history():
-    title_label.config(text="История последних 10 запросов")
+def onAuthorize():
+    global userToken
+    userToken = userAuthorization()
+    if userToken == '':
+        messagebox.showerror("Ошибка", "Не удалось авторизоваться")
+        return
+    authorizeButton.pack_forget()
+    titleLabel.config(text="Введите ссылку на профиль")
+    labelInput.pack(pady=10)
+    textInput.pack(padx=10)
+    button.pack(pady=10)
+    labelOutput.pack(pady=10, side='left')
+    labelOutput2.pack(pady=10, side='right')
+    textOutput.pack(pady=15, side='left')
+    textOutput2.pack(pady=15, side='right')
 
 
 #Вычисляет id пользовтеля и тут же начинает бесконечный цикл ожидания завершения функций
 #Вероятно нужно придумать как блокировать кнопку при едином ее нажатии
 #Потому что никак не противоречит что у нас много функций в многих потоках, но вывод то у них 1, и они будут его перезаписывать
 def runAsyncTasks(updateOutput1, updateOutput2):
-    id_user = text_input.get("1.0", tk.END).strip()
-    id_user = extract_identifier(id_user)
-    id_user = get_numeric_id(id_user, SERVICE_TOKEN)
+    userID = textInput.get("1.0", tk.END).strip()
+    userID = extractIdentifier(userID)
+    userID = getNumericID(userID, serviceToken)
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
     loop.run_until_complete(asyncio.gather(
-        analyze(id_user, updateOutput1),
-        lysher(id_user, updateOutput2),
+        analyze(userID, updateOutput1),
+        lysher(userID, updateOutput2),
     ))
 
 #Вероятно нужно придумать как блокировать кнопку при едином ее нажатии
@@ -91,38 +86,35 @@ def onTap():
 
 #Функция которая пишет в таблицу (Много аргументов)
 def OutputMany(result):
-    text_output.config(state='normal')
-    text_output.delete("1.0", tk.END)
+    textOutput.config(state='normal')
+    textOutput.delete("1.0", tk.END)
     for text in result:
-        text_output.insert(tk.END, text + "\n")
-    print(result)
-    text_output.config(state='disabled')
+        textOutput.insert(tk.END, text + "\n")
+    textOutput.config(state='disabled')
 
 #Функция которая пишет в таблицу (Один Аргумент)
 def OutputSolo(result):
-    text_output2.config(state='normal')
-    text_output2.delete("1.0", tk.END)
-    text_output2.insert(tk.END, result)
-    text_output2.config(state='disabled')
+    textOutput2.config(state='normal')
+    textOutput2.delete("1.0", tk.END)
+    textOutput2.insert(tk.END, result)
+    textOutput2.config(state='disabled')
 
 root = tk.Tk()
 root.title("AI_HELPER")
 root.geometry("800x600")
 root.title("Авторизация через VK ID")
 
-title_label = tk.Label(root, text="АВТОРИЗУЙТЕСЬ В СЕРВИСЕ С ПОМОЩЬЮ VK ID", font=("Arial", 14))
-title_label.pack(pady=10)
+titleLabel = tk.Label(root, text="АВТОРИЗУЙТЕСЬ В СЕРВИСЕ С ПОМОЩЬЮ VK ID", font=("Arial", 14))
+titleLabel.pack(pady=10)
 
-authorize_button = tk.Button(root, text="Авторизоваться", command=on_authorize)
-authorize_button.pack(pady=5)
+authorizeButton = tk.Button(root, text="Авторизоваться", command=onAuthorize)
+authorizeButton.pack(pady=5)
 
-button_analyze = tk.Button(root, text="Анализ", width=6, height=1, command=on_authorize)
-button_history = tk.Button(root, text="История", width=6, height=1, command=on_history)
-label_input = tk.Label(root, text="Введите id:")
-text_input = scrolledtext.ScrolledText(root, width=60, height=10)
+labelInput = tk.Label(root, text="Введите id:")
+textInput = scrolledtext.ScrolledText(root, width=60, height=10)
 button = tk.Button(root, text="Выполнить анализ", command=onTap)
-label_output = tk.Label(root, text="Результат анализа:")
-label_output2 = tk.Label(root, text="Результат Люшера:")
-text_output = scrolledtext.ScrolledText(root, width=35, wrap = tk.WORD, height=10, state='disabled')
-text_output2 = scrolledtext.ScrolledText(root, width=35, wrap = tk.WORD, height=10, state='disabled')
+labelOutput = tk.Label(root, text="Результат анализа:")
+labelOutput2 = tk.Label(root, text="Результат Люшера:")
+textOutput = scrolledtext.ScrolledText(root, width=35, wrap = tk.WORD, height=10, state='disabled')
+textOutput2 = scrolledtext.ScrolledText(root, width=35, wrap = tk.WORD, height=10, state='disabled')
 root.mainloop()

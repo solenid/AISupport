@@ -1,5 +1,5 @@
 import requests
-def check_spelling(text):
+def checkSpelling(text):
     url = "https://speller.yandex.net/services/spellservice.json/checkText"
     params = {
         'text': text,

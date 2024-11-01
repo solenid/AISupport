@@ -3,23 +3,23 @@ import requests
 from vk_api import VkApiError
 import GetInfoFromVK as getinfo
 import GetToken as gt
-from colorCHECK import colorCHECK
+from СolorCheck import colorCheck
 # import users
 import numpy as np
 from tensorflow import keras
 
 # data
-TOKEN = gt.get_token()
+TOKEN = gt.getToken()
 # data
 
-def get_posts_photo(user_id: str, token):
-    res_photos = [[],[]]
-    vk = getinfo.get_vk_session(TOKEN)
+def getPostsPhoto(userID: str, token):
+    resPhotos = [[],[]]
+    vk = getinfo.getVKSession(TOKEN)
     if vk is None:
         exit()
 
     try:
-        dataForWallGetById = vk.wall.get(owner_id=user_id, count=10, filter='owner', extended=0, offset=0)
+        dataForWallGetById = vk.wall.get(owner_id=userID, count=10, filter='owner', extended=0, offset=0)
     except VkApiError as e:
         print(f"Ошибка при получении постов: {e}")
         return []
@@ -30,9 +30,9 @@ def get_posts_photo(user_id: str, token):
                 print(element['photo'])
                 photo = element['photo']['orig_photo']['url']
                 photoId = element['photo']['id']
-                res_photos[0].append(photo)
-                res_photos[1].append(photoId)
-    return res_photos
+                resPhotos[0].append(photo)
+                resPhotos[1].append(photoId)
+    return resPhotos
 
 
 def userGetInfo(user_id: str, token, choice):
@@ -121,7 +121,7 @@ def testLusher(x, countColor):
 
 
 def startTestLusher(user_id: str):
-    result = get_posts_photo(user_id,TOKEN)
+    result = getPostsPhoto(user_id, TOKEN)
     if(result == []):
         return "Мы не смогли получить данные\nВозможно, пользователь, которого вы проверяете, не даёт доступ к данным."
     #print(result)
@@ -134,7 +134,7 @@ def startTestLusher(user_id: str):
     }
     for i in result[0]:
         #print("New url => " + i)
-        testLusher(np.array(colorCHECK(i, 20)), countColor)
+        testLusher(np.array(colorCheck(i, 20)), countColor)
 
     mostPopularColor = (max(countColor, key=countColor.get))
 
