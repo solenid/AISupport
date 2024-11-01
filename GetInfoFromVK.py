@@ -243,6 +243,5 @@ def get_info(user_id: str, SERVICE_TOKEN, USER_TOKEN):
     result.append(f"Грамотность: {get_criteria_grade(criteriaLiter)}")
     result.append(f"Активность: {get_criteria_grade(criteriaActivity)}")
     result.append(f"Степень дивиации: {get_criteria_grade(criteriaRedFlag)}")
-
     result.append("--- %s секунд на анализ профиля ---" % (int(time.time() - start_time)))
     return result
