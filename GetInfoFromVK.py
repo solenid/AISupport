@@ -5,6 +5,7 @@ from WordsFinder import *
 from GetPosts import *
 from GetToken import *
 from UsersGet import *
+from GreenWordsFinder import *
 
 TOKEN = getToken()
 
@@ -182,12 +183,19 @@ def getInfoFromVK(userID: str, serviceToken, userToken):
                 totalForbiddenCount = forbiddenWordsSearch(postsText, totalForbiddenCount)
                 result.append(f"Общее кол-во матерных постов: {totalForbiddenCount}")
 
-                #Оценка дивиации
-                if totalForbiddenCount/numPosts > 0.15:
-                    if totalForbiddenCount/numPosts > 0.25:
+                # Оценка дивиации
+                if totalForbiddenCount / numPosts > 0.15:
+                    if totalForbiddenCount / numPosts > 0.25:
                         criteriaRedFlag += 2
                     else:
                         criteriaRedFlag += 1
+
+                # 6+ Количество постов по теме PR менеджемента
+                totalGFWordCount = 0
+                totalGFWordCount = greenWordInPosts(postsText, totalGFWordCount)
+                result.append(f"Общее кол-во ревелантных постов: {totalGFWordCount}")
+
+
 
                 # 7. Количество экстремистких слов в постах
                 totalForbiddenCount = 0
