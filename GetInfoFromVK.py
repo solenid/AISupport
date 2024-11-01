@@ -57,6 +57,8 @@ def getCriteriaGrade(score):
 
 def getGroupsTheme(vk, userID):
     dictionaryThemes = {}
+    garbageThemesKeyWords = ["заблокирован", "закрытое", "закрытый", "недоступный", "недоступно"] # Здесь добавляем
+                                                                        # ключевые слова ненужных нам тем (строчными)
     offset = 0
     count = 1000
     while True:
@@ -76,7 +78,7 @@ def getGroupsTheme(vk, userID):
             break
         for group in groups:
             activity = group.get('activity')
-            if activity:
+            if activity and not any(keyword in activity.lower() for keyword in garbageThemesKeyWords):
                 if activity in dictionaryThemes:
                     dictionaryThemes[f'{activity}'] += 1
                 else:
