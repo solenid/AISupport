@@ -192,7 +192,7 @@ def getInfoFromVK(userID: str, serviceToken, userToken):
                 # 7. Количество экстремистких слов в постах
                 totalForbiddenCount = 0
                 for text in postsText:
-                    forbiddenCount = count_extremism_words(text)
+                    forbiddenCount = countExtremismWords(text)
                     totalForbiddenCount += forbiddenCount
                 result.append(f"Общее кол-во экстремистких слов в постах: {totalForbiddenCount}")
 
