@@ -6,6 +6,7 @@ cursor = conn.cursor()
 
 cursor.execute('''
     CREATE TABLE IF NOT EXISTS scan_history (
+        user_id INTEGER PRIMARY KEY AUTOINCREMENT,
         last_name TEXT NOT NULL,
         first_name TEXT NOT NULL,
         friend_count INTEGER NOT NULL CHECK(friend_count >= 0),
@@ -16,49 +17,51 @@ cursor.execute('''
         extremist_word_count INTEGER NOT NULL DEFAULT 0 CHECK(extremist_word_count >= 0),
         threat_word_count INTEGER NOT NULL DEFAULT 0 CHECK(threat_word_count >= 0),
         group_themes TEXT,
-        user_rating REAL CHECK(user_rating >= 0 AND user_rating <= 100)
+        user_rating REAL CHECK(user_rating >= 0 AND user_rating <= 100),
+        user_link TEXT NOT NULL
     )
 ''')
 
 
-def add_user(last_name, first_name, friend_count, total_posts, total_comments, total_likes,
-             profanity_count, extremist_word_count, threat_word_count, group_themes, user_rating):
-    group_themes_json = json.dumps(group_themes)
+def addUser(lastName, firstName, friendCount, totalPosts, totalComments, totalLikes,
+            profanityCount, extremistWordCount, threatWordCount, groupThemes, userRating, userLink):
+    group_themes_json = json.dumps(groupThemes)
 
     cursor.execute('''
         INSERT INTO scan_history (
-            last_name, first_name, friend_count, total_posts, total_comments, total_likes,
-            profanity_count, extremist_word_count,
-            threat_word_count, group_themes, user_rating
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            lastName, firstName, friendCount, totalPosts, totalComments, totalLikes,
+            profanityCount, extremistWordCount,
+            threatWordCount, groupThemes, userRating, userLink
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ''', (
-        last_name,
-        first_name,
-        friend_count,
-        total_posts,
-        total_comments,
-        total_likes,
-        profanity_count,
-        extremist_word_count,
-        threat_word_count,
-        group_themes_json,
-        user_rating
+        lastName,
+        firstName,
+        friendCount,
+        totalPosts,
+        totalComments,
+        totalLikes,
+        profanityCount,
+        extremistWordCount,
+        threatWordCount,
+        groupThemes,
+        userRating,
+        userLink
     ))
     conn.commit()
 
 
-def get_users():
+def getUsers():
     cursor.execute('SELECT * FROM scan_history')
     row = cursor.fetchall()
     for user in row:
         user = list(user)
-        user[9] = json.loads(user[9]) if user[9] else []
+        user[10] = json.loads(user[10]) if user[10] else []
         print(user)
 
 
 def delete_user():
     cursor.execute('DELETE FROM scan_history')
+    conn.commit()
 
 
-get_users()
 conn.close()

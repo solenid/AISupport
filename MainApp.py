@@ -7,6 +7,7 @@ from GetInfoFromVK import get_info
 from GetToken import get_token
 import testLusher as tL
 from Authorization import user_authorization
+from DataBaseInterface import *
 #Для асинхронности
 import threading
 import asyncio
@@ -42,7 +43,7 @@ def get_numeric_id(user_identifier, access_token, api_version='5.131'):
               'v': api_version}
     response = requests.get(url, params=params)
     data = response.json()
-    print(data)
+    #print(data)
     return str(data['response'][0]['id'])
 
 def on_authorize():
@@ -68,7 +69,7 @@ def on_authorize():
 
 def on_history():
     title_label.config(text="История последних 10 запросов")
-    
+
 
 #Вычисляет id пользовтеля и тут же начинает бесконечный цикл ожидания завершения функций
 #Вероятно нужно придумать как блокировать кнопку при едином ее нажатии
@@ -94,6 +95,7 @@ def OutputMany(result):
     text_output.delete("1.0", tk.END)
     for text in result:
         text_output.insert(tk.END, text + "\n")
+    print(result)
     text_output.config(state='disabled')
 
 #Функция которая пишет в таблицу (Один Аргумент)

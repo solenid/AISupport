@@ -50,44 +50,10 @@ def userGetInfo(user_id: str, token, choice):
     }
     responseForWallGetById = requests.get(urlWallGetById, params=paramsForWallGetById)
     dataForWallGetById = responseForWallGetById.json()
-    if (choice == "text"):
-        print(f"Проверка на {choice}")
-        for elements in dataForWallGetById['response']['items']:
-            if (elements['text'] != ""):
-                print("--------------------------------------")
-                print(f"id => {elements['id']}")
-                print(elements['text'])
-                print("--------------------------------------\n")
-            else:
-                print("--------------------------------------")
-                print(f"id => {elements['id']}")
-                print("Текста нет")
-                print("--------------------------------------\n")
-
-    if (choice == "photo"):
-        print(f"Проверка на {choice}")
-        for elements in dataForWallGetById['response']['items']:
-            for element in elements['attachments']:  # Указываем параметр, который нас интересует в посте
-                photo = element['photo']['orig_photo']
-                # print(photo)
-                if (photo['url'] != ""):
-                    print("--------------------------------------")
-                    print(f"id => {elements['id']}")
-                    print(f"Size original photo: {photo['width']}x{photo['height']}")
-                    print(f"Type => {element['type']}")
-                    print(f"Photo url => {photo['url']}")
-                    print("--------------------------------------\n")
-
-                else:
-                    print("--------------------------------------")
-                    print(f"id => {elements['id']}")
-                    print("фото нет")
-                    print("--------------------------------------\n")
-
 
 # Функция для установки цвета текста с использованием ANSI escape codes
-def print_rgb(r, g, b, text):
-    print(f"\033[38;2;{r};{g};{b}m{text}\033[0m")
+#def print_rgb(r, g, b, text):
+    #print(f"\033[38;2;{r};{g};{b}m{text}\033[0m")
 
 
 def whatIsColorMean(indexLargeElement, countColor):
@@ -119,38 +85,38 @@ def testLusher(x, countColor):
     indexLargeElement = sumPrediction.index(max(sumPrediction))
     whatIsColorMean(indexLargeElement, countColor)
 
-    print("Вывод для наглядного просмотра")
+    #print("Вывод для наглядного просмотра")
 
-    print("For Blue")
+    #print("For Blue")
     InputDatasize = x.size
     counter = 0
     for i in predictionBlue:
         if (counter < InputDatasize):
-            print_rgb(x[counter][0], x[counter][1], x[counter][2], i)
+            #print_rgb(x[counter][0], x[counter][1], x[counter][2], i)
             counter += 1
 
-    print("For Yellow")
+    #print("For Yellow")
     InputDatasize = x.size
     counter = 0
     for i in predictionYellow:
         if (counter < InputDatasize):
-            print_rgb(x[counter][0], x[counter][1], x[counter][2], i)
+            #print_rgb(x[counter][0], x[counter][1], x[counter][2], i)
             counter += 1
 
-    print("For Green")
+    #print("For Green")
     InputDatasize = x.size
     counter = 0
     for i in predictionGreen:
         if (counter < InputDatasize):
-            print_rgb(x[counter][0], x[counter][1], x[counter][2], i)
+            #print_rgb(x[counter][0], x[counter][1], x[counter][2], i)
             counter += 1
 
-    print("For Red")
+    #print("For Red")
     InputDatasize = x.size
     counter = 0
     for i in predictionRed:
         if (counter < InputDatasize):
-            print_rgb(x[counter][0], x[counter][1], x[counter][2], i)
+            #print_rgb(x[counter][0], x[counter][1], x[counter][2], i)
             counter += 1
 
 
@@ -158,7 +124,7 @@ def startTestLusher(user_id: str):
     result = get_posts_photo(user_id,TOKEN)
     if(result == []):
         return "Мы не смогли получить данные\nВозможно, пользователь, которого вы проверяете, не даёт доступ к данным."
-    print(result)
+    #print(result)
 
     countColor = {
         'blue': 0,
@@ -167,7 +133,7 @@ def startTestLusher(user_id: str):
         "green": 0
     }
     for i in result[0]:
-        print("New url => " + i)
+        #print("New url => " + i)
         testLusher(np.array(colorCHECK(i, 20)), countColor)
 
     mostPopularColor = (max(countColor, key=countColor.get))
