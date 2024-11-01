@@ -3,7 +3,7 @@ import requests
 from vk_api import VkApiError
 import GetInfoFromVK as getinfo
 import GetToken as gt
-from СolorCheck import colorCHECK
+from СolorCheck import colorCheck
 # import users
 import numpy as np
 from tensorflow import keras
@@ -168,7 +168,7 @@ def startTestLusher(user_id: str):
     }
     for i in result[0]:
         print("New url => " + i)
-        testLusher(np.array(colorCHECK(i, 20)), countColor)
+        testLusher(np.array(colorCheck(i, 20)), countColor)
 
     mostPopularColor = (max(countColor, key=countColor.get))
 
