@@ -74,10 +74,13 @@ def runAsyncTasks(updateOutput1, updateOutput2):
         analyze(userID, updateOutput1),
         lysher(userID, updateOutput2),
     ))
+    button.config(state=tk.ACTIVE)
 
 #Вероятно нужно придумать как блокировать кнопку при едином ее нажатии
 def onTap():
-    threading.Thread(target=runAsyncTasks, args=(OutputMany, OutputSolo)).start()
+    button.config(state=tk.DISABLED)
+    t1 = threading.Thread(target=runAsyncTasks, args=(OutputMany, OutputSolo), daemon=True)
+    t1.start()
 
 #Функция которая пишет в таблицу (Много аргументов)
 def OutputMany(result):
