@@ -5,7 +5,7 @@ from tkinter import scrolledtext, messagebox
 
 from GetInfoFromVK import get_info
 from GetToken import get_token
-import testLusher as tL
+import TestLusher as tL
 from Authorization import user_authorization
 #Для асинхронности
 import threading
