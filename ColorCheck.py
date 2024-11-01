@@ -11,7 +11,7 @@ except ImportError:
 Point = namedtuple('Point', ('coords', 'n', 'ct'))
 Cluster = namedtuple('Cluster', ('points', 'center', 'n'))
 
-def get_points(img):
+def getPoints(img):
     points = []
     w, h = img.size
     for count, color in img.getcolors(w * h):
@@ -22,7 +22,7 @@ rtoh = lambda rgb: '#%s' % ''.join(('%02x' % p for p in rgb))
 
 def colorz(img, n=3):  # Изменено на img вместо filename
     img.thumbnail((200, 200))
-    points = get_points(img)
+    points = getPoints(img)
     clusters = kmeans(points, n, 1)
     rgbs = [list(map(int, c.center.coords)) for c in clusters]  # Используем list() для преобразования
     return rgbs #list(map(rtoh, rgbs))  # Используем list() для преобразования
@@ -32,7 +32,7 @@ def euclidean(p1, p2):
         (p1.coords[i] - p2.coords[i]) ** 2 for i in range(p1.n)
     ]))
 
-def calculate_center(points, n):
+def calculateCenter(points, n):
     vals = [0.0 for i in range(n)]
     plen = 0
     for p in points:
@@ -41,44 +41,43 @@ def calculate_center(points, n):
             vals[i] += (p.coords[i] * p.ct)
     return Point([(v / plen) for v in vals], n, 1)
 
-def kmeans(points, k, min_diff):
+def kmeans(points, k, minDiff):
     clusters = [Cluster([p], p, p.n) for p in random.sample(points, k)]
 
     while True:
         plists = [[] for _ in range(k)]
 
         for p in points:
-            smallest_distance = float('Inf')
+            smallestDistance = float('Inf')
             for i in range(k):
                 distance = euclidean(p, clusters[i].center)
-                if distance < smallest_distance:
-                    smallest_distance = distance
+                if distance < smallestDistance:
+                    smallestDistance = distance
                     idx = i
             plists[idx].append(p)
 
         diff = 0
         for i in range(k):
             old = clusters[i]
-            center = calculate_center(plists[i], old.n)
+            center = calculateCenter(plists[i], old.n)
             new = Cluster(plists[i], center, old.n)
             clusters[i] = new
             diff = max(diff, euclidean(old.center, new.center))
 
-        if diff < min_diff:
+        if diff < minDiff:
             break
 
     return clusters
 
-def download_image(url):
+def downloadImage(url):
     response = requests.get(url)
     response.raise_for_status()  # Проверка на ошибки
     return Image.open(BytesIO(response.content))
 
-def colorCHECK(url, n_colors):
+def colorCheck(url, nColors):
     try:
-        image = download_image(url)
-        dominant_colors = colorz(image, n=n_colors)  # Обновите вызов функции colorz
-        return dominant_colors
+        image = downloadImage(url)
+        return colorz(image, n=nColors)  # Обновите вызов функции colorz
     except Exception as e:
         print(f"Произошла ошибка: {e}")
 
