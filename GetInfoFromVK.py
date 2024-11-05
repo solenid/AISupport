@@ -193,7 +193,7 @@ def getInfoFromVK(userID: str, serviceToken, userToken):
                 # 6+ Количество постов по теме PR менеджемента
                 totalGFWordCount = 0
                 totalGFWordCount = greenWordInPosts(postsText, totalGFWordCount)
-                result.append(f"Общее кол-во ревелантных постов: {totalGFWordCount}")
+                result.append(f"Общее кол-во релевантных постов: {totalGFWordCount}")
 
 
 
@@ -202,7 +202,7 @@ def getInfoFromVK(userID: str, serviceToken, userToken):
                 for text in postsText:
                     forbiddenCount = countExtremismWords(text)
                     totalForbiddenCount += forbiddenCount
-                result.append(f"Общее кол-во экстремистких слов в постах: {totalForbiddenCount}")
+                result.append(f"Общее кол-во экстремистских слов в постах: {totalForbiddenCount}")
 
                 # Оценка дивиации
                 if totalForbiddenCount / totalWords > 0.05:

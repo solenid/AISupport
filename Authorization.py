@@ -73,6 +73,7 @@ def exchangeCodeForToken(code):
         return None
 
 def userAuthorization():
+    startTime = time.time()
     global accessToken
     servThread = threading.Thread(target=runServer)
     servThread.daemon = True
@@ -80,6 +81,12 @@ def userAuthorization():
     webbrowser.open(authURL)
     while authorizationCode is None:
         time.sleep(1)
+        ourTime = time.time() - startTime
+        print("Время авторизации")
+        print(ourTime)
+        if ourTime > 25:
+            print("Долго выполняется басурман"
+                  "Богатырей не хватает на них...")
     accessToken = exchangeCodeForToken(authorizationCode)
     if accessToken:
         return accessToken

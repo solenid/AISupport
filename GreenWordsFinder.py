@@ -28,11 +28,11 @@ def predictSentence(sentence):
     sequence = tokenizer.texts_to_sequences([sentence])
     padSequence = tf.keras.preprocessing.sequence.pad_sequences(sequence, maxlen=14)
     prediction = loadedModel.predict(padSequence)
-    return prediction[0][0] > 0.6  # Если вероятность > 0.6, то содержит ключевое слово
+    return prediction[0][0] > 0.7  # Если вероятность > 0.7, то содержит ключевое слово
 
 # Идет по тексту в постах, для удобства и точности каждый текст разбиваю каждые 5 пробелов,
-# если куско текста ему кажется подозрительным, то он идет по каждому слову в этом куске
-# и если находит слово-триггер сразу записывает пост в ревелантные
+# если кусок текста ему кажется подозрительным, то он идет по каждому слову в этом куске
+# и если находит слово-триггер сразу записывает пост в релевантные
 def greenWordInPosts(postTexts, count):
     greenFlag = False
     for text in postTexts:
