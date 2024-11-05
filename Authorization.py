@@ -85,7 +85,7 @@ def userAuthorization():
         print("Время авторизации")
         print(ourTime)
         if ourTime > 25:
-            print("Долго выполняется басурман"
+            print("Долго выполняется басурман\n"
                   "Богатырей не хватает на них...")
     accessToken = exchangeCodeForToken(authorizationCode)
     if accessToken:

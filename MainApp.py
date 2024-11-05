@@ -1,7 +1,7 @@
 import tkinter as tk
 import re
 import requests
-from tkinter import scrolledtext, messagebox
+from tkinter import scrolledtext, messagebox, font, ttk
 
 from GetInfoFromVK import getInfoFromVK
 from GetToken import getToken
@@ -96,15 +96,21 @@ def OutputSolo(result):
     textOutput2.insert(tk.END, result)
     textOutput2.config(state='disabled')
 
+
+
 root = tk.Tk()
+root.configure(bg='White')
+tkStyle = ttk.Style()
+fontAuthLabel = font.Font(family= "Arial Rounded MT Bold", size=18, weight="normal", slant="roman", underline=False, overstrike=False)
+fontAuthButton = font.Font(family= "Arial Rounded MT Bold", size=18, weight="normal", slant="italic", underline=False, overstrike=False)
+tkStyle.configure("TLabel",  font=fontAuthLabel, foreground="#FF0000", padding=8, background="#ffffff")
 root.title("AI_HELPER")
 root.geometry("800x600")
 root.title("Авторизация через VK ID")
-
-titleLabel = tk.Label(root, text="АВТОРИЗУЙТЕСЬ В СЕРВИСЕ С ПОМОЩЬЮ VK ID", font=("Arial", 14))
+titleLabel = ttk.Label(root, text="Войдите в систему", style="TLabel")
 titleLabel.pack(pady=10)
 
-authorizeButton = tk.Button(root, text="Авторизоваться", command=onAuthorize)
+authorizeButton = tk.Button(root,font=fontAuthButton, text="VK ID", bg="White", borderwidth=1,fg = "red", relief="ridge", command=onAuthorize)
 authorizeButton.pack(pady=5)
 
 labelInput = tk.Label(root, text="Введите id:")
