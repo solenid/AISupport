@@ -12,13 +12,13 @@ device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cp
 model.to(device)
 model.eval()
 
+
 def forbiddenWordsSearch(testTexts, count) -> int:
     predictions = predictProfanityForbidden(testTexts)
     for text, pred in zip(testTexts, predictions):
         if pred == 1:
             count += 1
     return count
-
 
 
 def predictProfanityForbidden(texts):
@@ -47,6 +47,7 @@ def countExtremismWords(text: str) -> int:
         return 0
     except Exception:
         return 0
+
 
 def countThreatWords(text: str) -> int:
     try:
