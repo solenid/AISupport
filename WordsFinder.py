@@ -1,16 +1,17 @@
 import torch
 import re
 import string
-from transformers import BertTokenizer, BertForSequenceClassification
-from dictionaries import *
+import transformers
+from transformers import pipeline
 
 modelDir = 'profanity_detection_model'
-tokenizer = BertTokenizer.from_pretrained(modelDir)
-model = BertForSequenceClassification.from_pretrained(modelDir)
+tokenizer = transformers.BertTokenizer.from_pretrained(modelDir)
+model = transformers.BertForSequenceClassification.from_pretrained(modelDir)
 
 device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 model.to(device)
 model.eval()
+
 
 def forbiddenWordsSearch(testTexts, count) -> int:
     predictions = predictProfanityForbidden(testTexts)
@@ -18,7 +19,6 @@ def forbiddenWordsSearch(testTexts, count) -> int:
         if pred == 1:
             count += 1
     return count
-
 
 
 def predictProfanityForbidden(texts):
@@ -47,6 +47,7 @@ def countExtremismWords(text: str) -> int:
         return 0
     except Exception:
         return 0
+
 
 def countThreatWords(text: str) -> int:
     try:

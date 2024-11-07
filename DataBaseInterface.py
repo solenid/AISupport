@@ -1,67 +1,93 @@
 import sqlite3
 import json
 
-conn = sqlite3.connect('history.db')
-cursor = conn.cursor()
 
-cursor.execute('''
-    CREATE TABLE IF NOT EXISTS scan_history (
-        user_id INTEGER PRIMARY KEY AUTOINCREMENT,
-        last_name TEXT NOT NULL,
-        first_name TEXT NOT NULL,
-        friend_count INTEGER NOT NULL CHECK(friend_count >= 0),
-        total_posts INTEGER NOT NULL CHECK(total_posts >= 0),
-        total_comments INTEGER NOT NULL CHECK(total_comments >= 0),
-        total_likes INTEGER NOT NULL CHECK(total_likes >= 0),
-        profanity_count INTEGER NOT NULL DEFAULT 0 CHECK(profanity_count >= 0),
-        extremist_word_count INTEGER NOT NULL DEFAULT 0 CHECK(extremist_word_count >= 0),
-        threat_word_count INTEGER NOT NULL DEFAULT 0 CHECK(threat_word_count >= 0),
-        group_themes TEXT,
-        user_rating REAL CHECK(user_rating >= 0 AND user_rating <= 100),
-        user_link TEXT NOT NULL
-    )
-''')
-
-
-def addUser(lastName, firstName, friendCount, totalPosts, totalComments, totalLikes,
-            profanityCount, extremistWordCount, threatWordCount, groupThemes, userRating, userLink):
-    group_themes_json = json.dumps(groupThemes)
-
+def addUser(lastName, firstName, birthDate, friendCount, totalPosts, totalComments, totalLikes,
+            profanityCount, errorsCount, extremistWordCount, threatWordCount, groupThemes, userRating, userLink):
+    groupThemesJson = json.dumps(groupThemes)
+    conn = sqlite3.connect('history.db')
+    cursor = conn.cursor()
     cursor.execute('''
         INSERT INTO scan_history (
-            lastName, firstName, friendCount, totalPosts, totalComments, totalLikes,
-            profanityCount, extremistWordCount,
+            lastName, firstName, birthDate, friendCount, totalPosts, totalComments, totalLikes,
+            profanityCount, errorsCount, extremistWordCount,
             threatWordCount, groupThemes, userRating, userLink
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ''', (
-        lastName,
-        firstName,
-        friendCount,
-        totalPosts,
-        totalComments,
-        totalLikes,
-        profanityCount,
-        extremistWordCount,
-        threatWordCount,
-        groupThemes,
-        userRating,
+        lastName,  # Собираю
+        firstName,  # Собираю
+        birthDate,  # Собираю
+        friendCount,  # Собираю
+        totalPosts,  # Собираю
+        totalComments,  # Собираю
+        totalLikes,  # Собираю
+        profanityCount,  # Собираю
+        errorsCount,  # Собираю
+        extremistWordCount,  # Собираю
+        threatWordCount,  # Собираю
+        groupThemesJson,  # Не собираю
+        userRating,  # Не собираю
         userLink
     ))
     conn.commit()
+    conn.close()
 
 
-def getUsers():
-    cursor.execute('SELECT * FROM scan_history')
-    row = cursor.fetchall()
-    for user in row:
-        user = list(user)
-        user[10] = json.loads(user[10]) if user[10] else []
+def getLast5Users():
+    """
+    Возвращает последние 5 пользователей с полями id, lastName, firstName, birthDate.
+    """
+    conn = sqlite3.connect('history.db')
+    cursor = conn.cursor()
+    cursor.execute('''
+        SELECT userID, lastName, firstName, birthDate
+        FROM scan_history
+        ORDER BY userID DESC
+        LIMIT 5
+    ''')
+    users = cursor.fetchall()
+    conn.close()
+    for user in users:
         print(user)
+    return users
 
 
-def delete_user():
-    cursor.execute('DELETE FROM scan_history')
+def getUserById(user_id):
+    """
+    Возвращает все данные пользователя по заданному id.
+
+    :param user_id: ID пользователя
+    :return: Кортеж с данными пользователя или None, если пользователь не найден
+    """
+    conn = sqlite3.connect('history.db')
+    cursor = conn.cursor()
+    cursor.execute('''
+        SELECT *
+        FROM scan_history
+        WHERE userID = ?
+    ''', (user_id,))
+    user = cursor.fetchone()
+    conn.close()
+    return user
+
+
+def deleteUserById(user_id):
+    """
+    Удаляет пользователя из базы данных по заданному id.
+
+    :param user_id: ID пользователя для удаления
+    :return: True, если пользователь был удалён, иначе False
+    """
+    conn = sqlite3.connect('history.db')
+    cursor = conn.cursor()
+    cursor.execute('''
+        DELETE FROM scan_history
+        WHERE userID = ?
+    ''', (user_id,))
     conn.commit()
+    changes = cursor.rowcount
+    conn.close()
+    return changes > 0
 
 
-conn.close()
+print(getUserById(4))
