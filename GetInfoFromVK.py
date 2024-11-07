@@ -1,14 +1,15 @@
 import vk_api
 import time
+import tkinter as tk
 from CheckSpelling import *
 from WordsFinder import *
 from GetPosts import *
 from GetToken import *
+from DataBaseInterface import *
 from UsersGet import *
-from GreenWordsFinder import *
 
 TOKEN = getToken()
-
+dataDB = []
 
 def getVKSession(token):
     try:
@@ -74,6 +75,7 @@ def getGroupsTheme(vk, userID):
         except VkApiError as error:
             print(f"Ошибка при получении групп: {error}")
             break
+
         groups = response.get('items', [])
         if not groups:
             break
@@ -89,6 +91,44 @@ def getGroupsTheme(vk, userID):
     value in sorted(dictionaryThemes.items(),
                     key=lambda item: item[1], reverse=True)}
     return list(sortedDict.keys())
+
+def GetBase(vk, USER_ID):
+    result = []
+    fields = 'status, bdate, universities, interests, schools'
+    try:
+        response = vk.users.get(user_ids=USER_ID, fields=fields)
+        # Если ответ получен и Если ответ не пуст
+        if (len(response) != 0):
+            result.append(f"Имя: {response[0]['first_name']}")
+            dataDB.append(response[0]['first_name'])
+            result.append(f"Фамилия: {response[0]['last_name']}")
+            dataDB.append(response[0]['last_name'])
+            #Дата рождения
+            if ('bdate' in response[0]):
+                result.append(f"Дата рождения: {response[0]['bdate']}")
+                dataDB.append(response[0]['bdate'])
+            #Статус
+            if (len(response[0]['status']) != 0):
+                result.append(f"Статус: {response[0]['status']}")
+            # Школы
+            if ('schools' in response[0]):
+                result.append(f"Школы:")
+                for school in response[0]['schools']:
+                    result.append(f"- {school['name']}")
+            # Если указан университет
+            if ('universities' in response[0]):
+                if (len(response[0]['universities']) != 0):
+                    result.append(f"Университет: {response[0]['universities'][0]['name']} \n")
+                    if 'faculty_name' in response[0]['universities']:
+                        if 'chair_name' in response[0]['universities']:
+                            result.append(f"{response[0]['universities'][0]['faculty_name']} - {response[0]['universities'][0]['chair_name']}")
+                        else:
+                            result.append(f"{response[0]['universities'][0]['faculty_name']}")
+        else:
+            print(response)
+    except VkApiError as e:
+        print(f"Ошибка при информации профиля: {e}")
+    return result
 
 
 def getInfoFromVK(userID: str, serviceToken, userToken):
@@ -113,6 +153,7 @@ def getInfoFromVK(userID: str, serviceToken, userToken):
     friendsNum = getNumberOfFriends(vk, userID)
     if friendsNum is not None:
         result[0].append(f"Количество друзей пользователя: {friendsNum}")
+        dataDB.append(friendsNum)
         #Оценка общительности
         if friendsNum > 100:
             if friendsNum > 200:
@@ -124,7 +165,8 @@ def getInfoFromVK(userID: str, serviceToken, userToken):
     # 2. Получение кол-ва постов за год
     posts = getPostsForLastYear(vk, userID)
     numPosts = len(posts)
-    result[0].append(f"Всего постов за год: {numPosts}")
+    result.append(f"Всего постов за год: {numPosts}")
+    dataDB.append(numPosts)
     if numPosts > 0:
 
         # Оценка Активности
@@ -137,7 +179,7 @@ def getInfoFromVK(userID: str, serviceToken, userToken):
         # 3. Общее количество комментариев за год
         totalComments = getTotalComments(posts)
         result[0].append(f"Общее количество комментариев за год: {totalComments}")
-
+        dataDB.append(totalComments)
         # Оценка общительности
         if totalComments > (friendsNum*(0.2)):
             if totalComments > (friendsNum*(0.5)):
@@ -148,6 +190,7 @@ def getInfoFromVK(userID: str, serviceToken, userToken):
         # 4. Общее количество лайков за год
         totalLikes = getTotalLikes(posts)
         result[0].append(f"Общее количество лайков за год: {totalLikes}")
+        dataDB.append(totalLikes)
 
         # Оценка общительности
         if totalLikes > (friendsNum*(0.50)):
@@ -170,6 +213,7 @@ def getInfoFromVK(userID: str, serviceToken, userToken):
             #!Если есть текст в постах СНОВА????????
             if (totalWords) > 0:
                 result[1].append(f"Общее кол-во постов за год, содержащие грамматические ошибки : {errCount}")
+                dataDB.append(errCount)
                 #Оценка грамотности (точности)
                 if (errCount) != 0:
                     if errCount/totalWords < 0.1:
@@ -178,11 +222,13 @@ def getInfoFromVK(userID: str, serviceToken, userToken):
                     criteriaLiter = 6
 
 
-                # 6. Количество матерных постов
-                totalForbiddenCount = 0
-                totalForbiddenCount = forbiddenWordsSearch(postsText, totalForbiddenCount)
+                totalForbiddenCount = 0 # 6. Количество матерных постов
+                totalGFWordCount = 0 # 6+ Количество постов по теме PR менеджемента
+                searcRes = WordsSearch(postsText, totalGFWordCount, totalForbiddenCount)
+                totalForbiddenCount = searcRes[0]
+                totalGFWordCount = searcRes[1]
                 result[1].append(f"Общее кол-во матерных постов: {totalForbiddenCount}")
-
+                result[2].append(f"Общее кол-во релевантных постов: {totalGFWordCount}")
                 # Оценка дивиации
                 if totalForbiddenCount / numPosts > 0.15:
                     if totalForbiddenCount / numPosts > 0.25:
@@ -190,10 +236,6 @@ def getInfoFromVK(userID: str, serviceToken, userToken):
                     else:
                         criteriaRedFlag += 1
 
-                # 6+ Количество постов по теме PR менеджемента
-                totalGFWordCount = 0
-                totalGFWordCount = greenWordInPosts(postsText, totalGFWordCount)
-                result[2].append(f"Общее кол-во релевантных постов: {totalGFWordCount}")
 
 
 
@@ -203,6 +245,7 @@ def getInfoFromVK(userID: str, serviceToken, userToken):
                     forbiddenCount = countExtremismWords(text)
                     totalForbiddenCount += forbiddenCount
                 result[1].append(f"Общее кол-во экстремистских слов в постах: {totalForbiddenCount}")
+                dataDB.append(totalForbiddenCount)
 
                 # Оценка дивиации
                 if totalForbiddenCount / totalWords > 0.05:
@@ -217,6 +260,7 @@ def getInfoFromVK(userID: str, serviceToken, userToken):
                     forbiddenCount = countThreatWords(text)
                     totalForbiddenCount += forbiddenCount
                 result[1].append(f"Общее кол-во слов-угроз в постах: {totalForbiddenCount}")
+                dataDB.append(totalForbiddenCount)
                 # Оценка дивиации
                 if totalForbiddenCount / totalWords > 0.05:
                     if totalForbiddenCount / totalWords > 0.15:
@@ -242,7 +286,15 @@ def getInfoFromVK(userID: str, serviceToken, userToken):
     result[0].append("Топ 5 тематик групп пользователя:")
     for theme in themes:
         result[0].append(f"- {theme}")
+    dataDB.append(themes[0])
+    dataDB.append(55)
+    dataDB.append('https://vk.com/h0w_to_survive')
 
+
+    addUser(dataDB[0],dataDB[1],dataDB[2],dataDB[3],dataDB[4],
+            dataDB[5],dataDB[6],dataDB[7],dataDB[8],dataDB[9],
+            dataDB[10],dataDB[11],dataDB[12], dataDB[13])
+    dataDB.clear()
     #10 ОЦЕНКА пользователя
     result[2].append(f"Общительность: {getCriteriaGrade(criteriaCommun)}")
     result[2].append(f"Грамотность: {getCriteriaGrade(criteriaLiter)}")
