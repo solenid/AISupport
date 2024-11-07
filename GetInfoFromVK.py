@@ -100,7 +100,7 @@ def getInfoFromVK(userID: str, serviceToken, userToken):
     criteriaActivity = 0 # Активность
     criteriaRedFlag = 0 # Ред флаги
 
-    result = [f"Используемый user_id: {userID}"]
+    result = [["ОБЩАЯ ИНФОРМАЦИЯ: ",f"Используемый user_id: {userID}"], ["RED FLAGs: "],["GREEN FLAGs: "]] # 0 - общая | 1 - red flags | 2 - green flags
     startTime = time.time()
     vk = getVKSession(serviceToken)
     if vk is None:
@@ -108,11 +108,11 @@ def getInfoFromVK(userID: str, serviceToken, userToken):
 
     base = GetBase(vk, userID)
     for res in base:
-        result.append(res)
+        result[0].append(res)
     # 1. Количество друзей
     friendsNum = getNumberOfFriends(vk, userID)
     if friendsNum is not None:
-        result.append(f"Количество друзей пользователя: {friendsNum}")
+        result[0].append(f"Количество друзей пользователя: {friendsNum}")
         #Оценка общительности
         if friendsNum > 100:
             if friendsNum > 200:
@@ -124,7 +124,7 @@ def getInfoFromVK(userID: str, serviceToken, userToken):
     # 2. Получение кол-ва постов за год
     posts = getPostsForLastYear(vk, userID)
     numPosts = len(posts)
-    result.append(f"Всего постов за год: {numPosts}")
+    result[0].append(f"Всего постов за год: {numPosts}")
     if numPosts > 0:
 
         # Оценка Активности
@@ -136,7 +136,7 @@ def getInfoFromVK(userID: str, serviceToken, userToken):
 
         # 3. Общее количество комментариев за год
         totalComments = getTotalComments(posts)
-        result.append(f"Общее количество комментариев за год: {totalComments}")
+        result[0].append(f"Общее количество комментариев за год: {totalComments}")
 
         # Оценка общительности
         if totalComments > (friendsNum*(0.2)):
@@ -147,7 +147,7 @@ def getInfoFromVK(userID: str, serviceToken, userToken):
 
         # 4. Общее количество лайков за год
         totalLikes = getTotalLikes(posts)
-        result.append(f"Общее количество лайков за год: {totalLikes}")
+        result[0].append(f"Общее количество лайков за год: {totalLikes}")
 
         # Оценка общительности
         if totalLikes > (friendsNum*(0.50)):
@@ -169,7 +169,7 @@ def getInfoFromVK(userID: str, serviceToken, userToken):
                     errCount += len(errors)
             #!Если есть текст в постах СНОВА????????
             if (totalWords) > 0:
-                result.append(f"Общее кол-во постов за год, содержащие грамматические ошибки : {errCount}")
+                result[1].append(f"Общее кол-во постов за год, содержащие грамматические ошибки : {errCount}")
                 #Оценка грамотности (точности)
                 if (errCount) != 0:
                     if errCount/totalWords < 0.1:
@@ -181,7 +181,7 @@ def getInfoFromVK(userID: str, serviceToken, userToken):
                 # 6. Количество матерных постов
                 totalForbiddenCount = 0
                 totalForbiddenCount = forbiddenWordsSearch(postsText, totalForbiddenCount)
-                result.append(f"Общее кол-во матерных постов: {totalForbiddenCount}")
+                result[1].append(f"Общее кол-во матерных постов: {totalForbiddenCount}")
 
                 # Оценка дивиации
                 if totalForbiddenCount / numPosts > 0.15:
@@ -193,7 +193,7 @@ def getInfoFromVK(userID: str, serviceToken, userToken):
                 # 6+ Количество постов по теме PR менеджемента
                 totalGFWordCount = 0
                 totalGFWordCount = greenWordInPosts(postsText, totalGFWordCount)
-                result.append(f"Общее кол-во релевантных постов: {totalGFWordCount}")
+                result[2].append(f"Общее кол-во релевантных постов: {totalGFWordCount}")
 
 
 
@@ -202,7 +202,7 @@ def getInfoFromVK(userID: str, serviceToken, userToken):
                 for text in postsText:
                     forbiddenCount = countExtremismWords(text)
                     totalForbiddenCount += forbiddenCount
-                result.append(f"Общее кол-во экстремистских слов в постах: {totalForbiddenCount}")
+                result[1].append(f"Общее кол-во экстремистских слов в постах: {totalForbiddenCount}")
 
                 # Оценка дивиации
                 if totalForbiddenCount / totalWords > 0.05:
@@ -216,7 +216,7 @@ def getInfoFromVK(userID: str, serviceToken, userToken):
                 for text in postsText:
                     forbiddenCount = countThreatWords(text)
                     totalForbiddenCount += forbiddenCount
-                result.append(f"Общее кол-во слов-угроз в постах: {totalForbiddenCount}")
+                result[1].append(f"Общее кол-во слов-угроз в постах: {totalForbiddenCount}")
                 # Оценка дивиации
                 if totalForbiddenCount / totalWords > 0.05:
                     if totalForbiddenCount / totalWords > 0.15:
@@ -225,28 +225,29 @@ def getInfoFromVK(userID: str, serviceToken, userToken):
                         criteriaRedFlag += 1
             else:
                 # Если слов все-таки нет
-                result.append(f"Общее кол-во слов в постах: 0")
+                result[0].append(f"Отсутствуют текстовые посты")
                 criteriaRedFlag = -1
                 criteriaLiter = -1
         else:
-            result.append(f"Общее кол-во слов в постах: 0")
+            result[0].append(f"Отсутствуют текстовые посты")
             criteriaRedFlag = -1
             criteriaLiter = -1
     else:
+        result[0].append(f"Отсутствуют посты")
         criteriaRedFlag = -1
         criteriaLiter = -1
     # 9. Тематики групп пользователя
     vk = getVKSession(userToken)
     themes = getGroupsTheme(vk, userID)[:5]
-    result.append("Топ 5 тематик групп пользователя:")
+    result[0].append("Топ 5 тематик групп пользователя:")
     for theme in themes:
-        result.append(f"- {theme}")
+        result[0].append(f"- {theme}")
 
     #10 ОЦЕНКА пользователя
-    result.append(f"Общительность: {getCriteriaGrade(criteriaCommun)}")
-    result.append(f"Грамотность: {getCriteriaGrade(criteriaLiter)}")
-    result.append(f"Активность: {getCriteriaGrade(criteriaActivity)}")
-    result.append(f"Степень дивиации: {getCriteriaGrade(criteriaRedFlag)}")
+    result[2].append(f"Общительность: {getCriteriaGrade(criteriaCommun)}")
+    result[2].append(f"Грамотность: {getCriteriaGrade(criteriaLiter)}")
+    result[2].append(f"Активность: {getCriteriaGrade(criteriaActivity)}")
+    result[1].append(f"Степень дивиации: {getCriteriaGrade(criteriaRedFlag)}")
 
-    result.append("--- %s секунд на анализ профиля ---" % (int(time.time() - startTime)))
+    result[0].append("--- %s секунд на анализ профиля ---" % (int(time.time() - startTime)))
     return result

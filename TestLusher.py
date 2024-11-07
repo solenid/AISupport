@@ -12,7 +12,7 @@ from tensorflow import keras
 TOKEN = gt.getToken()
 # data
 
-def getPostsPhoto(userID: str, token):
+def getPostsPhoto(userID: str):
     resPhotos = [[],[]]
     vk = getinfo.getVKSession(TOKEN)
     if vk is None:
@@ -103,7 +103,7 @@ def testLusher(x, countColor):
 
 
 def startTestLusher(user_id: str):
-    result = getPostsPhoto(user_id, TOKEN)
+    result = getPostsPhoto(user_id)
     if(result == []):
         return "Мы не смогли получить данные\nВозможно, пользователь, которого вы проверяете, не даёт доступ к данным."
     print(result)
