@@ -1,5 +1,7 @@
 import tkinter as tk
-from tkinter import scrolledtext, messagebox
+import re
+import requests
+from tkinter import scrolledtext, messagebox, font, ttk
 
 import requests
 import TestLusher as tL
@@ -13,7 +15,6 @@ import re
 
 serviceToken = getToken()
 userToken = ''
-
 
 async def analyze(IDuser, updateOutput1):
     updateOutput1(getInfoFromVK(IDuser, serviceToken, userToken))
@@ -76,10 +77,13 @@ def runAsyncTasks(updateOutput1, updateOutput2):
         analyze(userID, updateOutput1),
         lysher(userID, updateOutput2),
     ))
+    button.config(state=tk.ACTIVE)
 
 
 def onTap():
-    threading.Thread(target=runAsyncTasks, args=(OutputMany, OutputSolo)).start()
+    button.config(state=tk.DISABLED)
+    t1 = threading.Thread(target=runAsyncTasks, args=(OutputMany, OutputSolo), daemon=True)
+    t1.start()
 
 
 def OutputMany(result):
@@ -98,14 +102,18 @@ def OutputSolo(result):
 
 
 root = tk.Tk()
+root.configure(bg='White')
+tkStyle = ttk.Style()
+fontAuthLabel = font.Font(family= "Arial Rounded MT Bold", size=18, weight="normal", slant="roman", underline=False, overstrike=False)
+fontAuthButton = font.Font(family= "Arial Rounded MT Bold", size=18, weight="normal", slant="italic", underline=False, overstrike=False)
+tkStyle.configure("TLabel",  font=fontAuthLabel, foreground="#FF0000", padding=8, background="#ffffff")
 root.title("AI_HELPER")
 root.geometry("800x600")
 root.title("Авторизация через VK ID")
-
-titleLabel = tk.Label(root, text="АВТОРИЗУЙТЕСЬ В СЕРВИСЕ С ПОМОЩЬЮ VK ID", font=("Arial", 14))
+titleLabel = ttk.Label(root, text="Войдите в систему", style="TLabel")
 titleLabel.pack(pady=10)
 
-authorizeButton = tk.Button(root, text="Авторизоваться", command=onAuthorize)
+authorizeButton = tk.Button(root,font=fontAuthButton, text="VK ID", bg="White", borderwidth=1,fg = "red", relief="ridge", command=onAuthorize)
 authorizeButton.pack(pady=5)
 
 labelInput = tk.Label(root, text="Введите id:")

@@ -31,7 +31,6 @@ def getPostsPhoto(userID: str, token):
                 resPhotos[1].append(photoId)
     return resPhotos
 
-
 def userGetInfo(user_id: str, token, choice):
     count_posts = 50
     filter = "owner"
@@ -47,11 +46,9 @@ def userGetInfo(user_id: str, token, choice):
     }
     responseForWallGetById = requests.get(urlWallGetById, params=paramsForWallGetById)
     dataForWallGetById = responseForWallGetById.json()
-
 # Функция для установки цвета текста с использованием ANSI escape codes
 #def print_rgb(r, g, b, text):
     #print(f"\033[38;2;{r};{g};{b}m{text}\033[0m")
-
 
 def whatIsColorMean(indexLargeElement, countColor):
     if indexLargeElement == 0:

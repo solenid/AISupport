@@ -1,12 +1,12 @@
 import torch
 import re
 import string
-import transformers
-from transformers import pipeline
+from transformers import BertTokenizer, BertForSequenceClassification
+from Dictionaries import *
 
-modelDir = 'profanity_detection_model'
-tokenizer = transformers.BertTokenizer.from_pretrained(modelDir)
-model = transformers.BertForSequenceClassification.from_pretrained(modelDir)
+modelDir = 'ProfanityDetectionModel'
+tokenizer = BertTokenizer.from_pretrained(modelDir)
+model = BertForSequenceClassification.from_pretrained(modelDir)
 
 device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 model.to(device)
@@ -33,7 +33,7 @@ def predictProfanityForbidden(texts):
 
 def countExtremismWords(text: str) -> int:
     try:
-        with open("dictionaries/extremism_words_file.txt", 'r', encoding='utf-8') as file:
+        with open("Dictionaries/extremism_words_file.txt", 'r', encoding='utf-8') as file:
             forbiddenWords = [line.strip().lower() for line in file if line.strip()]
         translator = str.maketrans('', '', string.punctuation)
         textClean = text.translate(translator).lower()
@@ -51,7 +51,7 @@ def countExtremismWords(text: str) -> int:
 
 def countThreatWords(text: str) -> int:
     try:
-        with open("dictionaries/threat_words_file.txt", 'r', encoding='utf-8') as file:
+        with open("Dictionaries/threat_words_file.txt", 'r', encoding='utf-8') as file:
             forbiddenWords = [line.strip().lower() for line in file if line.strip()]
         translator = str.maketrans('', '', string.punctuation)
         textClean = text.translate(translator).lower()

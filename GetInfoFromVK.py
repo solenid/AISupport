@@ -6,6 +6,8 @@ from WordsFinder import *
 from GetPosts import *
 from GetToken import *
 from DataBaseInterface import *
+from UsersGet import *
+from GreenWordsFinder import *
 
 TOKEN = getToken()
 dataDB = []
@@ -214,6 +216,7 @@ def getInfoFromVK(userID: str, serviceToken, userToken):
             if (totalWords) > 0:
                 result.append(f"Общее кол-во ошибок в постах за год : {errCount}")
                 dataDB.append(errCount)
+
                 #Оценка грамотности (точности)
                 if (errCount) != 0:
                     if errCount/totalWords < 0.1:
@@ -228,12 +231,19 @@ def getInfoFromVK(userID: str, serviceToken, userToken):
                 result.append(f"Общее кол-во матерных постов: {totalForbiddenCount}")
                 dataDB.append(totalForbiddenCount)
 
-                #Оценка дивиации
-                if totalForbiddenCount/numPosts > 0.15:
-                    if totalForbiddenCount/numPosts > 0.25:
+                # Оценка дивиации
+                if totalForbiddenCount / numPosts > 0.15:
+                    if totalForbiddenCount / numPosts > 0.25:
                         criteriaRedFlag += 2
                     else:
                         criteriaRedFlag += 1
+
+                # 6+ Количество постов по теме PR менеджемента
+                totalGFWordCount = 0
+                totalGFWordCount = greenWordInPosts(postsText, totalGFWordCount)
+                result.append(f"Общее кол-во релевантных постов: {totalGFWordCount}")
+
+
 
                 # 7. Количество экстремистких слов в постах
                 totalForbiddenCount = 0
