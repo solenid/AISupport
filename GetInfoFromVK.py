@@ -5,7 +5,6 @@ from WordsFinder import *
 from GetPosts import *
 from GetToken import *
 from UsersGet import *
-from GreenWordsFinder import *
 
 TOKEN = getToken()
 
@@ -178,10 +177,15 @@ def getInfoFromVK(userID: str, serviceToken, userToken):
                     criteriaLiter = 6
 
 
-                # 6. Количество матерных постов
-                totalForbiddenCount = 0
-                totalForbiddenCount = forbiddenWordsSearch(postsText, totalForbiddenCount)
+
+                totalForbiddenCount = 0 # 6. Количество матерных постов
+                totalGFWordCount = 0 # 6+ Количество постов по теме PR менеджемента
+                searcRes = WordsSearch(postsText, totalGFWordCount, totalForbiddenCount)
+                totalForbiddenCount = searcRes[0]
+                totalGFWordCount = searcRes[1]
                 result.append(f"Общее кол-во матерных постов: {totalForbiddenCount}")
+                # totalGFWordCount = greenWordInPosts(postsText, totalGFWordCount)
+                result.append(f"Общее кол-во релевантных постов: {totalGFWordCount}")
 
                 # Оценка дивиации
                 if totalForbiddenCount / numPosts > 0.15:
@@ -190,10 +194,9 @@ def getInfoFromVK(userID: str, serviceToken, userToken):
                     else:
                         criteriaRedFlag += 1
 
-                # 6+ Количество постов по теме PR менеджемента
-                totalGFWordCount = 0
-                totalGFWordCount = greenWordInPosts(postsText, totalGFWordCount)
-                result.append(f"Общее кол-во релевантных постов: {totalGFWordCount}")
+
+
+
 
 
 
