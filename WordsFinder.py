@@ -38,13 +38,13 @@ def predictBadWord(sentence):
     prediction = modelForBadie.predict(padSequence)
     return prediction[0][0] > 0.95  # Если вероятность > 0.95, то содержит ключевое слово
 
+
 #Используем модель для анализа текста (ПОИСК ПОЛЕЗНЫХ СЛОВ)
 def predictPrSentence(sentence):
     sequence = tokenizerForPr.texts_to_sequences([sentence])
     padSequence = tf.keras.preprocessing.sequence.pad_sequences(sequence, maxlen=14)
     prediction = modelPR.predict(padSequence)
     return prediction[0][0] > 0.7  # Если вероятность > 0.7, то содержит ключевое слово
-
 
 # Идет по тексту в постах, для удобства и точности каждый текст разбиваю каждые 5 пробелов,
 # если кусок текста ему кажется подозрительным, то он идет по каждому слову в этом куске
@@ -77,6 +77,7 @@ def WordsSearch(postTexts, countGreen, countRed):
             greenFlag = False
     return [countRed, countGreen]
 
+# Подсчет экстремистских слов
 def countExtremismWords(text: str) -> int:
     try:
         with open("Dictionaries/extremism_words_file.txt", 'r', encoding='utf-8') as file:
@@ -94,6 +95,7 @@ def countExtremismWords(text: str) -> int:
     except Exception:
         return 0
 
+# Подсчет слов-угроз
 def countThreatWords(text: str) -> int:
     try:
         with open("Dictionaries/threat_words_file.txt", 'r', encoding='utf-8') as file:
