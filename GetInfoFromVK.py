@@ -230,8 +230,6 @@ def getInfoFromVK(userID: str, serviceToken, userToken):
                 dataDB.append(totalForbiddenCount)
                 result[2].append(f"Общее кол-во релевантных постов: {totalGFWordCount}")
 
-                dataDB.append(totalForbiddenCount) #Маты в базе данных
-
                 # Оценка дивиации
                 if totalForbiddenCount / numPosts > 0.15:
                     if totalForbiddenCount / numPosts > 0.25:
