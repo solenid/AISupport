@@ -15,7 +15,7 @@ from GetToken import getToken
 dataForCommonInfo = [""]
 dataForRedFlag = [""]
 dataForGreenFlag = [""]
-dataForRecommend = ["Рекомендую"]
+dataForRecommend = [""]
 dataForTestLusher = [""]
 
 serviceToken = getToken()
@@ -348,6 +348,8 @@ class TestPage(QWidget):  # Исправил название класса на 
             dataForRedFlag.append(i)
         for i in result[2]:
             dataForGreenFlag.append(i)
+        for i in result[3]:
+            dataForRecommend.append(i)
     def update_output2(self, result):
         dataForTestLusher.append(result)
 
