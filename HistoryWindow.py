@@ -2,7 +2,6 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 from DataBaseInterface import *
 
-
 def get_last_five_scans():
     result = []
     users = getLast5Users()
@@ -33,7 +32,7 @@ def show_more_details(scan_id, root):
         tree.column("value", width=400, anchor='w')
         tree.pack(fill=tk.BOTH, expand=True)
 
-        column_names = ["Номер сканирования", "Имя", "Кашмак", "Дата Рождения", "Количество друзей",
+        column_names = ["Номер сканирования", "Имя", "Фамилия", "Дата Рождения", "Количество друзей",
                         "Количество Постов", "Количество Комментариев", "Количество Лайков", "Количество матов",
                         "Количество ошибок", "Экстремисткие слова", "Слова-Угрозы", "Темы групп", "Рейтинг Пользователя", "Ссылка на пользователя"]
 
@@ -42,10 +41,12 @@ def show_more_details(scan_id, root):
             tree.insert("", "end", values=(col, val))
 
 
-def show_history(root):
-    history_window = tk.Toplevel(root)
+def show_history():
+    history_window = tk.Tk()
     history_window.title("История сканов")
     history_window.geometry("1200x600")
+    history_window.configure(bg='White')
+
 
     columns = ("scan_id", "first_name", "last_name", "birth_date", "more")
     tree = ttk.Treeview(history_window, columns=columns, show="headings")
@@ -86,7 +87,9 @@ def show_history(root):
                     except ValueError:
                         messagebox.showerror("Ошибка", "Неверный ID скана.")
                         return
-                    show_more_details(scan_id, root)
+                    show_more_details(scan_id, history_window)
 
     tree.bind("<Button-1>", on_single_click)
+
+    history_window.mainloop()
 
