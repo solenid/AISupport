@@ -1,4 +1,3 @@
-# START
 import requests
 from vk_api import VkApiError
 import GetInfoFromVK as getinfo
@@ -8,9 +7,7 @@ from ColorCheck import colorCheck
 import numpy as np
 from tensorflow import keras
 
-# data
 TOKEN = gt.getToken()
-# data
 
 def getPostsPhoto(userID: str, token):
     resPhotos = [[],[]]
@@ -34,9 +31,24 @@ def getPostsPhoto(userID: str, token):
                 resPhotos[1].append(photoId)
     return resPhotos
 
+def userGetInfo(user_id: str, token, choice):
+    count_posts = 50
+    filter = "owner"
+    offset = 0
+    urlWallGetById = 'https://api.vk.com/method/wall.get'
+    paramsForWallGetById = {
+        'access_token': token,
+        'owner_id': f'{user_id}',
+        'offset': f'{offset}',
+        'count': f'{count_posts}',
+        'filter': f'{filter}',
+        'v': '5.131'  # Версия API
+    }
+    responseForWallGetById = requests.get(urlWallGetById, params=paramsForWallGetById)
+    dataForWallGetById = responseForWallGetById.json()
 # Функция для установки цвета текста с использованием ANSI escape codes
-def print_rgb(r, g, b, text):
-    print(f"\033[38;2;{r};{g};{b}m{text}\033[0m")
+#def print_rgb(r, g, b, text):
+    #print(f"\033[38;2;{r};{g};{b}m{text}\033[0m")
 
 def whatIsColorMean(indexLargeElement, countColor):
     if indexLargeElement == 0:
@@ -67,38 +79,38 @@ def testLusher(x, countColor):
     indexLargeElement = sumPrediction.index(max(sumPrediction))
     whatIsColorMean(indexLargeElement, countColor)
 
-    print("Вывод для наглядного просмотра")
+    #print("Вывод для наглядного просмотра")
 
-    print("For Blue")
+    #print("For Blue")
     InputDatasize = x.size
     counter = 0
     for i in predictionBlue:
         if (counter < InputDatasize):
-            print_rgb(x[counter][0], x[counter][1], x[counter][2], i)
+            #print_rgb(x[counter][0], x[counter][1], x[counter][2], i)
             counter += 1
 
-    print("For Yellow")
+    #print("For Yellow")
     InputDatasize = x.size
     counter = 0
     for i in predictionYellow:
         if (counter < InputDatasize):
-            print_rgb(x[counter][0], x[counter][1], x[counter][2], i)
+            #print_rgb(x[counter][0], x[counter][1], x[counter][2], i)
             counter += 1
 
-    print("For Green")
+    #print("For Green")
     InputDatasize = x.size
     counter = 0
     for i in predictionGreen:
         if (counter < InputDatasize):
-            print_rgb(x[counter][0], x[counter][1], x[counter][2], i)
+            #print_rgb(x[counter][0], x[counter][1], x[counter][2], i)
             counter += 1
 
-    print("For Red")
+    #print("For Red")
     InputDatasize = x.size
     counter = 0
     for i in predictionRed:
         if (counter < InputDatasize):
-            print_rgb(x[counter][0], x[counter][1], x[counter][2], i)
+            #print_rgb(x[counter][0], x[counter][1], x[counter][2], i)
             counter += 1
 
 
@@ -106,7 +118,7 @@ def startTestLusher(user_id: str):
     result = getPostsPhoto(user_id, TOKEN)
     if(result == []):
         return "Мы не смогли получить данные\nВозможно, пользователь, которого вы проверяете, не даёт доступ к данным."
-    print(result)
+    #print(result)
 
     countColor = {
         'blue': 0,
@@ -115,28 +127,27 @@ def startTestLusher(user_id: str):
         "green": 0
     }
     for i in result[0]:
-        print("New url => " + i)
+        #print("New url => " + i)
         testLusher(np.array(colorCheck(i, 20)), countColor)
 
     mostPopularColor = (max(countColor, key=countColor.get))
 
     message = "Не определён"
 
-    match mostPopularColor:
-        case 'yellow':
-            message = (" Самый часто используемый цвет на фото данного пользователя: ЖЕЛТЫЙ \n" +
-                       "Это значит что человек попадает под желтый тип" +
-                       "\nЖелтый тип - общительный, отзывчивый человек.  Им хорошо подходят  широкие социальные контакты.")
-        case 'blue':
-            message = (" Самый часто используемый цвет на фото данного пользователя: СИНИЙ \n" +
-                       "Это значит что человек попадает под синий тип" +
-                       "\nСиний тип - спокойный и уверенный в себе человек. Таким людям важно чувствовать себя в безопасности, быть всегда защищенными.")
-        case 'red':
-            message = (" Самый часто используемый цвет на фото данного пользователя: КРАСНЫЙ \n" +
-                       "Это значит что человек попадает под красный тип" +
-                       "\nКрасный тип - энергичный человек. Такие люди чувствует себя комфортно в активной деятельности.")
-        case 'green':
-            message = (" Самый часто используемый цвет на фото данного пользователя: ЗЕЛЁНЫЙ \n" +
-                       "Это значит что человек попадает под зелёный тип" +
-                       "\nЗеленый тип - настойчивый, но робкий человек. Ему комфортно в условиях, которые дают ощущение значимости и достоинства.")
+    if(mostPopularColor == 'yellow'):
+        message = (" Самый часто используемый цвет на фото данного пользователя: ЖЕЛТЫЙ \n" +
+                   "Это значит что человек попадает под желтый тип" +
+                   "\nЖелтый тип - общительный, отзывчивый человек.  Им хорошо подходят  широкие социальные контакты.")
+    if(mostPopularColor == 'blue'):
+        message = (" Самый часто используемый цвет на фото данного пользователя: СИНИЙ \n" +
+                   "Это значит что человек попадает под синий тип" +
+                   "\nСиний тип - спокойный и уверенный в себе человек. Таким людям важно чувствовать себя в безопасности, быть всегда защищенными.")
+    if (mostPopularColor == 'red'):
+        message = (" Самый часто используемый цвет на фото данного пользователя: КРАСНЫЙ \n" +
+                   "Это значит что человек попадает под красный тип" +
+                   "\nКрасный тип - энергичный человек. Такие люди чувствует себя комфортно в активной деятельности.")
+    if (mostPopularColor == 'green'):
+        message = (" Самый часто используемый цвет на фото данного пользователя: ЗЕЛЁНЫЙ \n" +
+                    "Это значит что человек попадает под зелёный тип" +
+                    "\nЗеленый тип - настойчивый, но робкий человек. Ему комфортно в условиях, которые дают ощущение значимости и достоинства.")
     return message
