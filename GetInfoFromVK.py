@@ -89,7 +89,6 @@ def getGroupsTheme(vk, userID):
                     key=lambda item: item[1], reverse=True)}
     return list(sortedDict.keys())
 
-
 def getInfoFromVK(userID: str, serviceToken, userToken):
 
     # Флаги оценок
@@ -193,12 +192,6 @@ def getInfoFromVK(userID: str, serviceToken, userToken):
                         criteriaRedFlag += 2
                     else:
                         criteriaRedFlag += 1
-
-
-
-
-
-
 
                 # 7. Количество экстремистких слов в постах
                 totalForbiddenCount = 0
