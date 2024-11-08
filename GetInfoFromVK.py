@@ -6,7 +6,6 @@ from WordsFinder import *
 from GetPosts import *
 from GetToken import *
 from DataBaseInterface import *
-from UsersGet import *
 
 TOKEN = getToken()
 dataDB = []
@@ -75,7 +74,6 @@ def getGroupsTheme(vk, userID):
         except VkApiError as error:
             print(f"Ошибка при получении групп: {error}")
             break
-
         groups = response.get('items', [])
         if not groups:
             break
@@ -139,8 +137,7 @@ def getInfoFromVK(userID: str, serviceToken, userToken):
     criteriaConcen = 0 # Концентрация
     criteriaActivity = 0 # Активность
     criteriaRedFlag = 0 # Ред флаги
-
-    result = [["ОБЩАЯ ИНФОРМАЦИЯ: ",f"Используемый user_id: {userID}"], ["RED FLAGs: "],["GREEN FLAGs: "]] # 0 - общая | 1 - red flags | 2 - green flags
+    result = [["ОБЩАЯ ИНФОРМАЦИЯ: ",f"Используемый user_id: {userID}"], ["RED FLAGs: "],["GREEN FLAGs: "],["Рекомендации:"]] # 0 - общая | 1 - red flags | 2 - green flags
     startTime = time.time()
     vk = getVKSession(serviceToken)
     if vk is None:
@@ -160,6 +157,8 @@ def getInfoFromVK(userID: str, serviceToken, userToken):
                 criteriaCommun += 2
             else:
                 criteriaCommun += 1
+    else:
+        dataDB.append(friendsNum)
 
 
     # 2. Получение кол-ва постов за год
@@ -229,6 +228,9 @@ def getInfoFromVK(userID: str, serviceToken, userToken):
                 totalGFWordCount = searcRes[1]
                 result[1].append(f"Общее кол-во матерных постов: {totalForbiddenCount}")
                 result[2].append(f"Общее кол-во релевантных постов: {totalGFWordCount}")
+
+                dataDB.append(totalForbiddenCount) #Маты в базе данных
+
                 # Оценка дивиации
                 if totalForbiddenCount / numPosts > 0.15:
                     if totalForbiddenCount / numPosts > 0.25:
@@ -236,8 +238,12 @@ def getInfoFromVK(userID: str, serviceToken, userToken):
                     else:
                         criteriaRedFlag += 1
 
-
-
+                # Оценка сосредоточенности
+                if totalGFWordCount > 0:
+                    if totalGFWordCount / numPosts > 0.05:
+                        criteriaConcen += 5
+                    else:
+                        criteriaConcen += 3
 
                 # 7. Количество экстремистких слов в постах
                 totalForbiddenCount = 0
@@ -268,28 +274,53 @@ def getInfoFromVK(userID: str, serviceToken, userToken):
                     else:
                         criteriaRedFlag += 1
             else:
+                dataDB.append(0)
+                dataDB.append(0)
+                dataDB.append(0)
+                dataDB.append(0)
                 # Если слов все-таки нет
                 result[0].append(f"Отсутствуют текстовые посты")
+                criteriaConcen = -1
                 criteriaRedFlag = -1
                 criteriaLiter = -1
         else:
+            dataDB.append(0)
+            dataDB.append(0)
+            dataDB.append(0)
+            dataDB.append(0)
             result[0].append(f"Отсутствуют текстовые посты")
+            criteriaConcen = -1
             criteriaRedFlag = -1
             criteriaLiter = -1
     else:
+        dataDB.append(0)
+        dataDB.append(0)
+        dataDB.append(0)
+        dataDB.append(0)
+        dataDB.append(0)
+        dataDB.append(0)
+
         result[0].append(f"Отсутствуют посты")
+        criteriaConcen = -1
         criteriaRedFlag = -1
         criteriaLiter = -1
     # 9. Тематики групп пользователя
     vk = getVKSession(userToken)
-    themes = getGroupsTheme(vk, userID)[:5]
+    themes = getGroupsTheme(vk, userID)[:5] #Топ 5 тематик пользователя
+
+    totalGFWordTheme = 0  # Количество тематик по теме PR менеджемента
+    searcRes = WordsSearch(themes, totalGFWordTheme, 0)
+    totalGFWordTheme = searcRes[1]
+    #Оценка концентрации
+    if totalGFWordTheme > 0:
+        criteriaConcen += 2
+
     result[0].append("Топ 5 тематик групп пользователя:")
     for theme in themes:
         result[0].append(f"- {theme}")
     dataDB.append(themes[0])
     dataDB.append(55)
     dataDB.append('https://vk.com/h0w_to_survive')
-
 
     addUser(dataDB[0],dataDB[1],dataDB[2],dataDB[3],dataDB[4],
             dataDB[5],dataDB[6],dataDB[7],dataDB[8],dataDB[9],
@@ -299,7 +330,52 @@ def getInfoFromVK(userID: str, serviceToken, userToken):
     result[2].append(f"Общительность: {getCriteriaGrade(criteriaCommun)}")
     result[2].append(f"Грамотность: {getCriteriaGrade(criteriaLiter)}")
     result[2].append(f"Активность: {getCriteriaGrade(criteriaActivity)}")
+    result[2].append(f"Вовлеченность: {getCriteriaGrade(criteriaConcen)}")
     result[1].append(f"Степень дивиации: {getCriteriaGrade(criteriaRedFlag)}")
 
+    if criteriaRedFlag <= 2:
+        if criteriaCommun > 4 and criteriaLiter > 4 and criteriaActivity > 4 and criteriaConcen > 4:
+            result[3].append(f"ВЫСОКО РЕКОМЕНДУЮ на основании:\n Общительность,Грамотность,Активность,Вовлеченность - на высшем уровне")
+        elif (criteriaCommun > 4 and criteriaLiter > 4):
+            result[3].append(f"РЕКОМЕНДУЮ на основании:\n Общительность,Грамотность - на высшем уровне")
+        elif (criteriaCommun > 4 and criteriaConcen > 4):
+            result[3].append(f"РЕКОМЕНДУЮ на основании:\n Общительность,Вовлеченность - на высшем уровне")
+        elif (criteriaCommun > 4 and criteriaActivity > 4):
+            result[3].append(f"РЕКОМЕНДУЮ на основании:\n Общительность,Активность - на высшем уровне")
+        elif (criteriaActivity > 4 and criteriaConcen > 4):
+            result[3].append(f"РЕКОМЕНДУЮ на основании:\n Активность,Вовлеченность - на высшем уровне")
+        elif (criteriaActivity > 4 and criteriaLiter > 4):
+            result[3].append(f"РЕКОМЕНДУЮ на основании:\n Активность,Грамотность - на высшем уровне")
+        elif (criteriaConcen > 4 and criteriaLiter > 4):
+            result[3].append(f"РЕКОМЕНДУЮ на основании:\n Вовлеченность,Грамотность - на высшем уровне")
+        elif (criteriaCommun > 4 or criteriaActivity > 4 or criteriaConcen > 4):
+            if criteriaCommun > 4:
+                result[3].append(f"Стоит обратить внимание так как Общительность - на высшем уровне")
+            if criteriaActivity > 4:
+                result[3].append(f"Стоит обратить внимание так как Активность - на высшем уровне")
+            if criteriaConcen > 4:
+                result[3].append(f"Стоит обратить внимание так как Вовлеченность - на высшем уровне")
+        elif criteriaCommun > 2 and criteriaLiter > 2 and criteriaActivity > 2 and criteriaConcen > 2:
+            result[3].append("Кандидат обладает средниими показателями, ему есть куда расти")
+        else:
+            result[3].append("НЕ РЕКОМЕНДУЮ на основании отсутвия необходимых качеств (Они на среднем-низком уровне)")
+    else:
+        if criteriaCommun > 4 and criteriaLiter > 4 and criteriaActivity > 4 and criteriaConcen > 4:
+            result[3].append(f"РЕКОМЕНДУЮ на основании:\n Общительность,Грамотность,Активность,Вовлеченность - на высшем уровне\n !Следует обратить внимание на высокую степень дивиации!")
+        elif (criteriaCommun > 4 and criteriaLiter > 4):
+            result[3].append(f"Стоит обратить внимание так как Общительность,Грамотность - на высшем уровне\n !ВНИМАНИЕ высокая степень дивиации!")
+        elif (criteriaCommun > 4 and criteriaConcen > 4):
+            result[3].append(f"Стоит обратить внимание так как Общительность,Вовлеченность - на высшем уровне\n !ВНИМАНИЕ высокая степень дивиации!")
+        elif (criteriaCommun > 4 and criteriaActivity > 4):
+            result[3].append(f"Стоит обратить внимание так как Общительность,Активность - на высшем уровне\n !ВНИМАНИЕ высокая степень дивиации!")
+        elif (criteriaActivity > 4 and criteriaConcen > 4):
+            result[3].append(f"Стоит обратить внимание так как Активность,Вовлеченность - на высшем уровне\n !ВНИМАНИЕ высокая степень дивиации!")
+        elif (criteriaActivity > 4 and criteriaLiter > 4):
+            result[3].append(f"Стоит обратить внимание так как Активность,Грамотность - на высшем уровне\n !ВНИМАНИЕ высокая степень дивиации!")
+        elif (criteriaConcen > 4 and criteriaLiter > 4):
+            result[3].append(f"Стоит обратить внимание так как Вовлеченность,Грамотность - на высшем уровне\n !ВНИМАНИЕ высокая степень дивиации!")
+        else:
+            result[3].append(f"НЕ РЕКОМЕНДУЮ на основании слишком высокой степени Дивиации")
+    result[3].append("Не забудьте заглянуть в тест Люшера!")
     result[0].append("--- %s секунд на анализ профиля ---" % (int(time.time() - startTime)))
     return result
