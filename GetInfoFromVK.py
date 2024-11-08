@@ -164,7 +164,7 @@ def getInfoFromVK(userID: str, serviceToken, userToken):
     # 2. Получение кол-ва постов за год
     posts = getPostsForLastYear(vk, userID)
     numPosts = len(posts)
-    result.append(f"Всего постов за год: {numPosts}")
+    result[0].append(f"Всего постов за год: {numPosts}")
     dataDB.append(numPosts)
     if numPosts > 0:
 
@@ -227,9 +227,8 @@ def getInfoFromVK(userID: str, serviceToken, userToken):
                 totalForbiddenCount = searcRes[0]
                 totalGFWordCount = searcRes[1]
                 result[1].append(f"Общее кол-во матерных постов: {totalForbiddenCount}")
+                dataDB.append(totalForbiddenCount)
                 result[2].append(f"Общее кол-во релевантных постов: {totalGFWordCount}")
-
-                dataDB.append(totalForbiddenCount) #Маты в базе данных
 
                 # Оценка дивиации
                 if totalForbiddenCount / numPosts > 0.15:

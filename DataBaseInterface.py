@@ -88,6 +88,3 @@ def deleteUserById(user_id):
     changes = cursor.rowcount
     conn.close()
     return changes > 0
-
-
-print(getUserById(4))

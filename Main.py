@@ -1,6 +1,4 @@
 import re
-from time import sleep
-
 from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QApplication, QWidget, QVBoxLayout, QLabel, QRadioButton, QCheckBox, QPushButton, \
     QGridLayout, QDialog, QLineEdit, QTextEdit
@@ -10,7 +8,7 @@ from Authorization import *  # Убедитесь, что этот импорт 
 import threading
 import asyncio
 import TestLusher as tL
-
+from HistoryWindow import *
 from GetInfoFromVK import getInfoFromVK
 from GetToken import getToken
 
@@ -103,7 +101,6 @@ class TestPage(QWidget):  # Исправил название класса на 
     def __init__(self):  # Исправил метод на __init__
         super().__init__()  # Исправил вызов супер-класса
         self.setWindowTitle('HR SOLUTION')
-        self.setWindowIcon(QIcon("icon2.png"))  # Укажите путь к вашему файлу иконки
         self.resize(1000, 600)  # Установите размер окна здесь
         self.setStyleSheet("""
             background-color: #ffffff;
@@ -254,13 +251,32 @@ class TestPage(QWidget):  # Исправил название класса на 
         self.output = QTextEdit()
         self.output.setReadOnly(True)  # Делаем поле только для чтения
         self.output.setStyleSheet("""
-            margin:30px 30px 30px 30px;
+            margin:30px 30px 60px 30px;
             background-color:#ffffff;
             color:#000000;
             border: 2px solid #D53032; /* Граница кнопки */
         """)
         self.layout.addWidget(self.output, 4, 0, 5, 5)
         self.output.hide()  # Скрываем текстовое поле
+
+        self.buttonHistory = QPushButton("История")
+        self.buttonHistory.setStyleSheet("""
+            background-color: #ffffff;
+            color: #D53032;
+            font-size:18px;
+            margin:300% 0px 0px 0px;
+            font-weight: bold;
+            padding: 1px 10px 1px 10px; /* Отступы внутри кнопки */
+            border: 2px solid #D53032; /* Граница кнопки */
+            border-top: none;
+            border-right: none;
+            border-left: none; 
+            border-radius: 1px; /* Скругление углов */
+            cursor: pointer;
+        """)
+        self.layout.addWidget(self.buttonHistory, 5, 0)
+        self.buttons.append(self.buttonHistory)
+        self.buttonHistory.clicked.connect(self.clickHistory)
 
     def clickButtonCommonInfo(self):
         if not self.output.isHidden():
@@ -301,6 +317,10 @@ class TestPage(QWidget):  # Исправил название класса на 
         for i in dataForRecommend:
             self.output.append(i)
         self.output.show()  # Скрываем текстовое поле
+
+    def clickHistory(self):
+        print("History")
+        show_history()
 
     def runAsyncTasks(self):
         userID = self.inputText.text().strip()
