@@ -237,8 +237,8 @@ def getInfoFromVK(userID: str, serviceToken, userToken, type):
         midALikeNum = 125
         greatALikeNum = 175
     else:
-        printf("Ти кто?")
-        printf("Неопределенный тип пользователя!")
+        print("Ти кто?")
+        print("Неопределенный тип пользователя!")
         exit()
 
     # Флаги оценок

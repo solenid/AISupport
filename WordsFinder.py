@@ -81,7 +81,7 @@ def WordsSearch(postTexts, countGreen, countRed, type):
         with open('AiModel/tokenizerForArt.pkl', 'rb') as handle:
             tokeniGreen = pickle.load(handle)
     else:
-        printf("!!! ОШИБКА ПОИСКА СЛОВ, НЕИЗВЕСТНЫЙ ТИП ЧЕЛОВЕКА")
+        print("!!! ОШИБКА ПОИСКА СЛОВ, НЕИЗВЕСТНЫЙ ТИП ЧЕЛОВЕКА")
         exit()
 
     redFlag = False
