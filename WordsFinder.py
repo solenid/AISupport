@@ -4,15 +4,14 @@ import tensorflow as tf
 import pickle
 
 # Загрузка модели для матов
-modelForBadie = tf.keras.models.load_model('AiModel/modelBadWords.keras')
-# Загрузка модели для полезных слов
-modelPR = tf.keras.models.load_model('AiModel/modelGreenFlagPRManager.keras')
+modelRed = tf.keras.models.load_model('AiModel/modelBadWords.keras')
 # Загрузка токенизатора для матов
 with open('AiModel/tokenizerForBadWords.pkl', 'rb') as handle:
-    tokenzForBadie = pickle.load(handle)
-# Загрузка токенизатора для полезных слов
-with open('AiModel/tokenizer.pkl', 'rb') as handle:
-    tokenizerForPr = pickle.load(handle)
+    tokeniRed = pickle.load(handle)
+
+modelGreen = ''
+tokeniGreen = ''
+
 
 #Делит строки по определенному количеству пробелов
 def spliter(input_string, n):
@@ -33,24 +32,58 @@ def spliter(input_string, n):
 
 #Используем модель для анализа текста (ПОИСК МАТОВ)
 def predictBadWord(sentence):
-    sequence = tokenzForBadie.texts_to_sequences([sentence])
+    sequence = tokeniRed.texts_to_sequences([sentence])
     padSequence = tf.keras.preprocessing.sequence.pad_sequences(sequence, maxlen=4)
-    prediction = modelForBadie.predict(padSequence)
+    prediction = modelRed.predict(padSequence)
     return prediction[0][0] > 0.95  # Если вероятность > 0.95, то содержит ключевое слово
 
 
 #Используем модель для анализа текста (ПОИСК ПОЛЕЗНЫХ СЛОВ)
-def predictPrSentence(sentence):
-    sequence = tokenizerForPr.texts_to_sequences([sentence])
+def predictGreenWordSentence(modelGreen,tokeniGreen,sentence):
+    sequence = tokeniGreen.texts_to_sequences([sentence])
     padSequence = tf.keras.preprocessing.sequence.pad_sequences(sequence, maxlen=14)
-    prediction = modelPR.predict(padSequence)
+    prediction = modelGreen.predict(padSequence)
     return prediction[0][0] > 0.7  # Если вероятность > 0.7, то содержит ключевое слово
 
 # Идет по тексту в постах, для удобства и точности каждый текст разбиваю каждые 5 пробелов,
 # если кусок текста ему кажется подозрительным, то он идет по каждому слову в этом куске
 # и если находит слово-триггер сразу записывает пост в релевантные
 # + теперь смотрим пост на наличие матов, там жесткий отбор, так что нет надобности по каждому слову
-def WordsSearch(postTexts, countGreen, countRed):
+def WordsSearch(postTexts, countGreen, countRed, type):
+    if type == 0:
+        # Загрузка модели для полезных слов
+        modelGreen = tf.keras.models.load_model('AiModel/modelNature.keras')
+        # Загрузка токенизатора для полезных слов
+        with open('AiModel/tokenizerForNature.pkl', 'rb') as handle:
+            tokeniGreen = pickle.load(handle)
+    elif type == 1:
+        # Загрузка модели для полезных слов
+        modelGreen = tf.keras.models.load_model('AiModel/modelHuman.keras')
+        # Загрузка токенизатора для полезных слов
+        with open('AiModel/tokenizerForHuman.pkl', 'rb') as handle:
+            tokeniGreen = pickle.load(handle)
+    elif type == 2:
+        # Загрузка модели для полезных слов
+        modelGreen = tf.keras.models.load_model('AiModel/modelSymbol.keras')
+        # Загрузка токенизатора для полезных слов
+        with open('AiModel/tokenizerForSymbol.pkl', 'rb') as handle:
+            tokeniGreen = pickle.load(handle)
+    elif type == 3:
+        # Загрузка модели для полезных слов
+        modelGreen = tf.keras.models.load_model('AiModel/modelTech.keras')
+        # Загрузка токенизатора для полезных слов
+        with open('AiModel/tokenizerForTech.pkl', 'rb') as handle:
+            tokeniGreen = pickle.load(handle)
+    elif type == 4:
+        # Загрузка модели для полезных слов
+        modelGreen = tf.keras.models.load_model('AiModel/modelArt.keras')
+        # Загрузка токенизатора для полезных слов
+        with open('AiModel/tokenizerForArt.pkl', 'rb') as handle:
+            tokeniGreen = pickle.load(handle)
+    else:
+        print("!!! ОШИБКА ПОИСКА СЛОВ, НЕИЗВЕСТНЫЙ ТИП ЧЕЛОВЕКА")
+        exit()
+
     redFlag = False
     greenFlag = False
     for text in postTexts:
@@ -60,10 +93,10 @@ def WordsSearch(postTexts, countGreen, countRed):
                     print(f"МАТ - {textsPart}") #ОТЛАДКА!#ОТЛАДКА!#ОТЛАДКА!#ОТЛАДКА!#ОТЛАДКА!#ОТЛАДКА!#ОТЛАДКА!#ОТЛАДКА!#ОТЛАДКА!
                     redFlag = True
             if not greenFlag:
-                if predictPrSentence(textsPart):
+                if predictGreenWordSentence(modelGreen, tokeniGreen,textsPart):
                     print(f"ПОДОЗРЕНИЕ на pr - {textsPart}") #ОТЛАДКА!#ОТЛАДКА!#ОТЛАДКА!#ОТЛАДКА!#ОТЛАДКА!#ОТЛАДКА!#ОТЛАДКА!#ОТЛАДКА!#ОТЛАДКА!
                     for word in textsPart.split():
-                        if predictPrSentence(word):
+                        if predictGreenWordSentence(word):
                             print(f"PR слово - {word}") #ОТЛАДКА!#ОТЛАДКА!#ОТЛАДКА!#ОТЛАДКА!#ОТЛАДКА!#ОТЛАДКА!#ОТЛАДКА!#ОТЛАДКА!#ОТЛАДКА!
                             greenFlag = True
                             break

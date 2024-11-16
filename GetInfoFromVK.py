@@ -129,7 +129,117 @@ def GetBase(vk, USER_ID):
     return result
 
 
-def getInfoFromVK(userID: str, serviceToken, userToken):
+def getInfoFromVK(userID: str, serviceToken, userToken, type):
+
+    if type == 0: #Человек природа
+        # Ш-Общительность
+        midSFrNum = 30
+        greatSFrNum = 70
+        midPhotoNum = 1 #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ
+        greatPhotoNum = 2 #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ
+        # Грамотность
+        midErrNum = 20 #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ
+        greatErrNum = 30 #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ
+        # Вовлеченность (все в процентах)
+        midRelSubNum = 0.6
+        greatRelSubNum = 0.75
+        minRelPostNum = 0.6
+        greatRelPostNum = 0.75
+        # Активность
+        midActivPostNum = 3
+        greatActivPostNum = 5
+        midAComNum = 15
+        greatAComNum = 45
+        midALikeNum = 40
+        greatALikeNum = 90
+    elif type == 1: #Человек человек
+        # Ш-Общительность
+        midSFrNum = 100
+        greatSFrNum = 200
+        midPhotoNum = 5 #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ
+        greatPhotoNum = 15 #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ
+        # Грамотность
+        midErrNum = 10 #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ
+        greatErrNum = 20 #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ
+        # Вовлеченность (все в процентах)
+        midRelSubNum = 0.5
+        greatRelSubNum = 0.7
+        minRelPostNum = 0.5
+        greatRelPostNum = 0.7
+        # Активность
+        midActivPostNum = 6
+        greatActivPostNum = 10
+        midAComNum = 25
+        greatAComNum = 75
+        midALikeNum = 100
+        greatALikeNum = 150
+    elif type == 2: #Человек знак
+        # Ш-Общительность
+        midSFrNum = 40
+        greatSFrNum = 80
+        midPhotoNum = 2 #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ
+        greatPhotoNum = 3 #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ
+        # Грамотность
+        midErrNum = 10 #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ
+        greatErrNum = 25 #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ
+        # Вовлеченность (все в процентах)
+        midRelSubNum = 0.7
+        greatRelSubNum = 0.85
+        minRelPostNum = 0.7
+        greatRelPostNum = 0.85
+        # Активность
+        midActivPostNum = 4
+        greatActivPostNum = 6
+        midAComNum = 20
+        greatAComNum = 50
+        midALikeNum = 55
+        greatALikeNum = 120
+    elif type == 3: #Человек техника
+        # Ш-Общительность
+        midSFrNum = 35
+        greatSFrNum = 75
+        midPhotoNum = 1 #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ
+        greatPhotoNum = 2 #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ
+        # Грамотность
+        midErrNum = 25 #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ
+        greatErrNum = 30 #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ
+        # Вовлеченность (все в процентах)
+        midRelSubNum = 0.65
+        greatRelSubNum = 0.85
+        minRelPostNum = 0.65
+        greatRelPostNum = 0.85
+        # Активность
+        midActivPostNum = 4
+        greatActivPostNum = 5
+        midAComNum = 15
+        greatAComNum = 45
+        midALikeNum = 40
+        greatALikeNum = 90
+    elif type == 4: #Человек босс художки
+        # Ш-Общительность
+        midSFrNum = 120
+        greatSFrNum = 200
+        midPhotoNum = 7 #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ
+        greatPhotoNum = 15 #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ
+        # Грамотность
+        midErrNum = 25 #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ
+        greatErrNum = 45 #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ
+        # Вовлеченность (все в процентах)
+        midRelSubNum = 0.7
+        greatRelSubNum = 0.90
+        minRelPostNum = 0.7
+        greatRelPostNum = 0.90
+        # Активность
+        midActivPostNum = 7
+        greatActivPostNum = 12
+        midAComNum = 30
+        greatAComNum = 80
+        midALikeNum = 125
+        greatALikeNum = 175
+    else:
+        print("Ти кто?")
+        print("Неопределенный тип пользователя!")
+        exit()
 
     # Флаги оценок
     criteriaCommun = 0 # Общительность
@@ -152,11 +262,11 @@ def getInfoFromVK(userID: str, serviceToken, userToken):
         result[0].append(f"Количество друзей пользователя: {friendsNum}")
         dataDB.append(friendsNum)
         #Оценка общительности
-        if friendsNum > 100:
-            if friendsNum > 200:
-                criteriaCommun += 2
+        if friendsNum > midSFrNum:
+            if friendsNum > greatSFrNum:
+                criteriaCommun += 6
             else:
-                criteriaCommun += 1
+                criteriaCommun += 3
     else:
         dataDB.append(friendsNum)
 
@@ -169,34 +279,34 @@ def getInfoFromVK(userID: str, serviceToken, userToken):
     if numPosts > 0:
 
         # Оценка Активности
-        if numPosts > 2:
-            if numPosts > 6:
-                criteriaActivity = 6
+        if numPosts > midActivPostNum:
+            if numPosts > greatActivPostNum:
+                criteriaActivity = 2
             else:
-                criteriaActivity = 4
+                criteriaActivity = 1
 
         # 3. Общее количество комментариев за год
         totalComments = getTotalComments(posts)
         result[0].append(f"Общее количество комментариев за год: {totalComments}")
         dataDB.append(totalComments)
-        # Оценка общительности
-        if totalComments > (friendsNum*(0.2)):
-            if totalComments > (friendsNum*(0.5)):
-                criteriaCommun += 2
+        # Оценка Активности (общ)
+        if totalComments > (midAComNum):
+            if totalComments > (greatAComNum):
+                criteriaActivity += 2
             else:
-                criteriaCommun += 1
+                criteriaActivity += 1
 
         # 4. Общее количество лайков за год
         totalLikes = getTotalLikes(posts)
         result[0].append(f"Общее количество лайков за год: {totalLikes}")
         dataDB.append(totalLikes)
 
-        # Оценка общительности
-        if totalLikes > (friendsNum*(0.50)):
-            if totalLikes > (friendsNum*(0.75)):
-                criteriaCommun += 2
+        # Оценка Активность  (общ)
+        if totalLikes > (midALikeNum):
+            if totalLikes > (greatALikeNum):
+                criteriaActivity += 2
             else:
-                criteriaCommun += 1
+                criteriaActivity += 1
 
         #!Если есть текст в постах
         postsText = getPostsText(posts)
@@ -223,7 +333,7 @@ def getInfoFromVK(userID: str, serviceToken, userToken):
 
                 totalForbiddenCount = 0 # 6. Количество матерных постов
                 totalGFWordCount = 0 # 6+ Количество постов по теме PR менеджемента
-                searcRes = WordsSearch(postsText, totalGFWordCount, totalForbiddenCount)
+                searcRes = WordsSearch(postsText, totalGFWordCount, totalForbiddenCount, type)
                 totalForbiddenCount = searcRes[0]
                 totalGFWordCount = searcRes[1]
                 result[1].append(f"Общее кол-во матерных постов: {totalForbiddenCount}")
@@ -237,12 +347,12 @@ def getInfoFromVK(userID: str, serviceToken, userToken):
                     else:
                         criteriaRedFlag += 1
 
-                # Оценка сосредоточенности
-                if totalGFWordCount > 0:
-                    if totalGFWordCount / numPosts > 0.05:
-                        criteriaConcen += 5
-                    else:
+                # Оценка сосредоточенности Вовлеченность
+                if totalGFWordCount > minRelPostNum:
+                    if totalGFWordCount / numPosts > greatRelPostNum:
                         criteriaConcen += 3
+                    else:
+                        criteriaConcen += 1.5
 
                 # 7. Количество экстремистких слов в постах
                 totalForbiddenCount = 0
@@ -305,17 +415,20 @@ def getInfoFromVK(userID: str, serviceToken, userToken):
         criteriaLiter = -1
     # 9. Тематики групп пользователя
     vk = getVKSession(userToken)
-    themes = getGroupsTheme(vk, userID)[:5] #Топ 5 тематик пользователя
+    themes = getGroupsTheme(vk, userID) #Топ 5 тематик пользователя
 
     totalGFWordTheme = 0  # Количество тематик по теме PR менеджемента
-    searcRes = WordsSearch(themes, totalGFWordTheme, 0)
+    searcRes = WordsSearch(themes, totalGFWordTheme, 0, type)
     totalGFWordTheme = searcRes[1]
     #Оценка концентрации
-    if totalGFWordTheme > 0:
-        criteriaConcen += 2
+    if totalGFWordTheme > midRelSubNum:
+        if totalGFWordTheme > greatRelSubNum:
+            criteriaConcen += 3
+        else:
+            criteriaConcen += 1.5
 
     result[0].append("Топ 5 тематик групп пользователя:")
-    for theme in themes:
+    for theme in themes [:5]:
         result[0].append(f"- {theme}")
     dataDB.append(themes[0])
     dataDB.append(55)
