@@ -304,9 +304,7 @@ class TestPage(QWidget):  # Исправил название класса на 
             self.analyze(self.userID),
             self.lysher(self.userID),
         ))
-        self.button.setEnabled(True)
     def onTap(self):
-        # self.button.setEnabled(False)
         t1 = threading.Thread(target=self.runAsyncTasks, daemon=True)
         t1.start()
 
