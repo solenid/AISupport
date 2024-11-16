@@ -152,7 +152,7 @@ def getInfoFromVK(userID: str, serviceToken, userToken, type):
         greatAComNum = 45
         midALikeNum = 40
         greatALikeNum = 90
-    elif type == 1: #Человек человек
+    elif type == 1 or type == -1: #Человек человек (Здесь находится наш основной путь PR)
         # Ш-Общительность
         midSFrNum = 100
         greatSFrNum = 200
@@ -448,46 +448,12 @@ def getInfoFromVK(userID: str, serviceToken, userToken, type):
     if criteriaRedFlag <= 2:
         if criteriaCommun > 4 and criteriaLiter > 4 and criteriaActivity > 4 and criteriaConcen > 4:
             result[3].append(f"ВЫСОКО РЕКОМЕНДУЮ на основании:\n Общительность,Грамотность,Активность,Вовлеченность - на высшем уровне")
-        elif (criteriaCommun > 4 and criteriaLiter > 4):
-            result[3].append(f"РЕКОМЕНДУЮ на основании:\n Общительность,Грамотность - на высшем уровне")
-        elif (criteriaCommun > 4 and criteriaConcen > 4):
-            result[3].append(f"РЕКОМЕНДУЮ на основании:\n Общительность,Вовлеченность - на высшем уровне")
-        elif (criteriaCommun > 4 and criteriaActivity > 4):
-            result[3].append(f"РЕКОМЕНДУЮ на основании:\n Общительность,Активность - на высшем уровне")
-        elif (criteriaActivity > 4 and criteriaConcen > 4):
-            result[3].append(f"РЕКОМЕНДУЮ на основании:\n Активность,Вовлеченность - на высшем уровне")
-        elif (criteriaActivity > 4 and criteriaLiter > 4):
-            result[3].append(f"РЕКОМЕНДУЮ на основании:\n Активность,Грамотность - на высшем уровне")
-        elif (criteriaConcen > 4 and criteriaLiter > 4):
-            result[3].append(f"РЕКОМЕНДУЮ на основании:\n Вовлеченность,Грамотность - на высшем уровне")
-        elif (criteriaCommun > 4 or criteriaActivity > 4 or criteriaConcen > 4):
-            if criteriaCommun > 4:
-                result[3].append(f"Стоит обратить внимание так как Общительность - на высшем уровне")
-            if criteriaActivity > 4:
-                result[3].append(f"Стоит обратить внимание так как Активность - на высшем уровне")
-            if criteriaConcen > 4:
-                result[3].append(f"Стоит обратить внимание так как Вовлеченность - на высшем уровне")
         elif criteriaCommun > 2 and criteriaLiter > 2 and criteriaActivity > 2 and criteriaConcen > 2:
-            result[3].append("Кандидат обладает средниими показателями, ему есть куда расти")
+            result[3].append(f"РЕКОМЕНДУЮ на основании:\n Общительность,Грамотность,Активность,Вовлеченность - на высоком/среднем уровне")
         else:
-            result[3].append("НЕ РЕКОМЕНДУЮ на основании отсутвия необходимых качеств (Они на среднем-низком уровне)")
+            result[3].append("НЕ РЕКОМЕНДУЮ на основании отсутвия необходимых качеств")
     else:
-        if criteriaCommun > 4 and criteriaLiter > 4 and criteriaActivity > 4 and criteriaConcen > 4:
-            result[3].append(f"РЕКОМЕНДУЮ на основании:\n Общительность,Грамотность,Активность,Вовлеченность - на высшем уровне\n !Следует обратить внимание на высокую степень дивиации!")
-        elif (criteriaCommun > 4 and criteriaLiter > 4):
-            result[3].append(f"Стоит обратить внимание так как Общительность,Грамотность - на высшем уровне\n !ВНИМАНИЕ высокая степень дивиации!")
-        elif (criteriaCommun > 4 and criteriaConcen > 4):
-            result[3].append(f"Стоит обратить внимание так как Общительность,Вовлеченность - на высшем уровне\n !ВНИМАНИЕ высокая степень дивиации!")
-        elif (criteriaCommun > 4 and criteriaActivity > 4):
-            result[3].append(f"Стоит обратить внимание так как Общительность,Активность - на высшем уровне\n !ВНИМАНИЕ высокая степень дивиации!")
-        elif (criteriaActivity > 4 and criteriaConcen > 4):
-            result[3].append(f"Стоит обратить внимание так как Активность,Вовлеченность - на высшем уровне\n !ВНИМАНИЕ высокая степень дивиации!")
-        elif (criteriaActivity > 4 and criteriaLiter > 4):
-            result[3].append(f"Стоит обратить внимание так как Активность,Грамотность - на высшем уровне\n !ВНИМАНИЕ высокая степень дивиации!")
-        elif (criteriaConcen > 4 and criteriaLiter > 4):
-            result[3].append(f"Стоит обратить внимание так как Вовлеченность,Грамотность - на высшем уровне\n !ВНИМАНИЕ высокая степень дивиации!")
-        else:
-            result[3].append(f"НЕ РЕКОМЕНДУЮ на основании слишком высокой степени Дивиации")
+        result[3].append(f"НЕ РЕКОМЕНДУЮ на основании слишком высокой степени Дивиации")
     result[3].append("Не забудьте заглянуть в тест Люшера!")
     result[0].append("--- %s секунд на анализ профиля ---" % (int(time.time() - startTime)))
     return result
