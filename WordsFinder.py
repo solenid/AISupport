@@ -96,7 +96,7 @@ def WordsSearch(postTexts, countGreen, countRed, type):
                 if predictGreenWordSentence(modelGreen, tokeniGreen,textsPart):
                     print(f"ПОДОЗРЕНИЕ на pr - {textsPart}") #ОТЛАДКА!#ОТЛАДКА!#ОТЛАДКА!#ОТЛАДКА!#ОТЛАДКА!#ОТЛАДКА!#ОТЛАДКА!#ОТЛАДКА!#ОТЛАДКА!
                     for word in textsPart.split():
-                        if predictGreenWordSentence(word):
+                        if predictGreenWordSentence(modelGreen, tokeniGreen, word):
                             print(f"PR слово - {word}") #ОТЛАДКА!#ОТЛАДКА!#ОТЛАДКА!#ОТЛАДКА!#ОТЛАДКА!#ОТЛАДКА!#ОТЛАДКА!#ОТЛАДКА!#ОТЛАДКА!
                             greenFlag = True
                             break
