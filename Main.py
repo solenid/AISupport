@@ -6,6 +6,7 @@ from PyQt6.QtGui import QIcon
 from Authorization import *  # Убедитесь, что этот импорт корректен
 #Для асинхронности
 import threading
+import json
 import asyncio
 import TestLusher as tL
 from HistoryWindow import *
@@ -17,7 +18,6 @@ dataForRedFlag = [""]
 dataForGreenFlag = [""]
 dataForRecommend = [""]
 dataForTestLusher = [""]
-# flagError = 0
 serviceToken = getToken()
 
 def extractIdentifier(vkURL):
@@ -115,7 +115,6 @@ class TestPage(QWidget):  # Исправил название класса на 
         self.layout.setSpacing(0)
         self.layout.setAlignment(Qt.AlignmentFlag.AlignTop)
         self.buttons = []
-
 
         self.buttonCommonInfo = QPushButton("Общая информация")
         self.buttonCommonInfo.setStyleSheet("""
