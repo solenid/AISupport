@@ -35,6 +35,7 @@ def getNumericID(userIdentifier, accessToken, apiVersion='5.131'):
               'v': apiVersion}
     response = requests.get(url, params=params)
     data = response.json()
+    print(data)
     return str(data['response'][0]['id'])
 
 
@@ -296,6 +297,7 @@ class TestPage(QWidget):  # Исправил название класса на 
 
     def runAsyncTasks(self):
         # userID = self.inputText.text().strip()
+        print(self.userID)
         self.userID = extractIdentifier(self.userID)
         self.userID = getNumericID(self.userID, serviceToken)
         loop = asyncio.new_event_loop()
@@ -304,9 +306,7 @@ class TestPage(QWidget):  # Исправил название класса на 
             self.analyze(self.userID),
             self.lysher(self.userID),
         ))
-        self.button.setEnabled(True)
     def onTap(self):
-        # self.button.setEnabled(False)
         t1 = threading.Thread(target=self.runAsyncTasks, daemon=True)
         t1.start()
 
