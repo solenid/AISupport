@@ -18,6 +18,7 @@ dataForGreenFlag = [""]
 dataForRecommend = [""]
 dataForTestLusher = [""]
 
+
 serviceToken = getToken()
 
 def extractIdentifier(vkURL):
