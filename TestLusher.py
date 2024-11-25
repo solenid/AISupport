@@ -65,10 +65,10 @@ def whatIsColorMean(indexLargeElement, countColor):
 
 
 def testLusher(x, countColor):
-    modelBlue = keras.models.load_model('AiModel/my_model.keras')
-    modelYellow = keras.models.load_model('AiModel/my_modelYELLOW.keras')
-    modelGreen = keras.models.load_model('AiModel/my_modelGREEN.keras')
-    modelRed = keras.models.load_model('AiModel/my_modelRED.keras')
+    modelBlue = keras.models.load_model('AiModel/RGB+/my_model.keras')
+    modelYellow = keras.models.load_model('AiModel/RGB+/my_modelYELLOW.keras')
+    modelGreen = keras.models.load_model('AiModel/RGB+/my_modelGREEN.keras')
+    modelRed = keras.models.load_model('AiModel/RGB+/my_modelRED.keras')
 
     predictionBlue = modelBlue.predict(x)
     predictionYellow = modelYellow.predict(x)

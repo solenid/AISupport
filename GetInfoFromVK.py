@@ -19,7 +19,6 @@ def getVKSession(token):
         print(f"Ошибка при подключении к VK API: {e}")
         return None
 
-
 def getNumberOfFriends(vk, userID):
     try:
         response = vk.friends.get(user_id=userID, count=0)
@@ -90,11 +89,11 @@ def getGroupsTheme(vk, userID):
                     key=lambda item: item[1], reverse=True)}
     return list(sortedDict.keys())
 
-def GetBase(vk, USER_ID):
+def getBase(vk, userID):
     result = []
     fields = 'status, bdate, universities, interests, schools'
     try:
-        response = vk.users.get(user_ids=USER_ID, fields=fields)
+        response = vk.users.get(user_ids=userID, fields=fields)
         # Если ответ получен и Если ответ не пуст
         if (len(response) != 0):
             result.append(f"Имя: {response[0]['first_name']}")
@@ -128,18 +127,31 @@ def GetBase(vk, USER_ID):
         print(f"Ошибка при информации профиля: {e}")
     return result
 
+def getPhotoCount(vk, userID):
+    resPhotos = 0
+    try:
+        dataForWallGetById = vk.wall.get(owner_id=userID, filter='owner', extended=0, offset=0)
+    except VkApiError as e:
+        print(f"Ошибка при получении постов: {e}")
+        return resPhotos
+
+    for elements in dataForWallGetById['items']:
+        for element in elements['attachments']:
+            if ('photo' in element):
+                resPhotos += 1
+    return resPhotos
 
 def getInfoFromVK(userID: str, serviceToken, userToken, type):
-
+    # Грамотность
+    midErrNum = 0.1
+    greatErrNum = 0.25
+    # Остальное зависит от типа
     if type == 0: #Человек природа
         # Ш-Общительность
         midSFrNum = 30
         greatSFrNum = 70
-        midPhotoNum = 1 #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ
-        greatPhotoNum = 2 #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ
-        # Грамотность
-        midErrNum = 20 #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ
-        greatErrNum = 30 #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ
+        midPhotoNum = 1
+        greatPhotoNum = 2
         # Вовлеченность (все в процентах)
         midRelSubNum = 0.6
         greatRelSubNum = 0.75
@@ -156,11 +168,8 @@ def getInfoFromVK(userID: str, serviceToken, userToken, type):
         # Ш-Общительность
         midSFrNum = 100
         greatSFrNum = 200
-        midPhotoNum = 5 #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ
-        greatPhotoNum = 15 #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ
-        # Грамотность
-        midErrNum = 10 #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ
-        greatErrNum = 20 #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ
+        midPhotoNum = 5
+        greatPhotoNum = 15
         # Вовлеченность (все в процентах)
         midRelSubNum = 0.5
         greatRelSubNum = 0.7
@@ -177,11 +186,8 @@ def getInfoFromVK(userID: str, serviceToken, userToken, type):
         # Ш-Общительность
         midSFrNum = 40
         greatSFrNum = 80
-        midPhotoNum = 2 #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ
-        greatPhotoNum = 3 #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ
-        # Грамотность
-        midErrNum = 10 #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ
-        greatErrNum = 25 #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ
+        midPhotoNum = 2
+        greatPhotoNum = 3
         # Вовлеченность (все в процентах)
         midRelSubNum = 0.7
         greatRelSubNum = 0.85
@@ -198,11 +204,8 @@ def getInfoFromVK(userID: str, serviceToken, userToken, type):
         # Ш-Общительность
         midSFrNum = 35
         greatSFrNum = 75
-        midPhotoNum = 1 #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ
-        greatPhotoNum = 2 #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ
-        # Грамотность
-        midErrNum = 25 #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ
-        greatErrNum = 30 #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ
+        midPhotoNum = 1
+        greatPhotoNum = 2
         # Вовлеченность (все в процентах)
         midRelSubNum = 0.65
         greatRelSubNum = 0.85
@@ -219,11 +222,8 @@ def getInfoFromVK(userID: str, serviceToken, userToken, type):
         # Ш-Общительность
         midSFrNum = 120
         greatSFrNum = 200
-        midPhotoNum = 7 #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ
-        greatPhotoNum = 15 #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ
-        # Грамотность
-        midErrNum = 25 #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ
-        greatErrNum = 45 #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ #ОБРАТИ ВНИМАНИЕ
+        midPhotoNum = 7
+        greatPhotoNum = 15
         # Вовлеченность (все в процентах)
         midRelSubNum = 0.7
         greatRelSubNum = 0.90
@@ -252,7 +252,7 @@ def getInfoFromVK(userID: str, serviceToken, userToken, type):
     if vk is None:
         exit()
 
-    base = GetBase(vk, userID)
+    base = getBase(vk, userID)
     for res in base:
         result[0].append(res)
     # 1. Количество друзей
@@ -262,10 +262,16 @@ def getInfoFromVK(userID: str, serviceToken, userToken, type):
         #Оценка общительности
         if friendsNum > midSFrNum:
             if friendsNum > greatSFrNum:
-                criteriaCommun += 6
-            else:
                 criteriaCommun += 3
+            else:
+                criteriaCommun += 2
 
+    photosNum = getPhotoCount(vk, userID)
+    if photosNum > midPhotoNum:
+        if photosNum > greatPhotoNum:
+            criteriaCommun += 3
+        else:
+            criteriaCommun += 2
 
     # 2. Получение кол-ва постов за год
     posts = getPostsForLastYear(vk, userID)
@@ -312,16 +318,18 @@ def getInfoFromVK(userID: str, serviceToken, userToken, type):
                 errors = checkSpelling(text)
                 if errors:
                     errCount += len(errors)
+
             #!Если есть текст в постах СНОВА????????
             if (totalWords) > 0:
                 result[1].append(f"Общее кол-во постов за год, содержащие грамматические ошибки : {errCount}")
                 #Оценка грамотности (точности)
-                if (errCount) != 0:
-                    if errCount/totalWords < 0.1:
+                if errCount/totalWords < greatErrNum:
+                    if errCount/totalWords < midErrNum:
+                        criteriaLiter = 6
+                    else:
                         criteriaLiter = 4
                 else:
-                    criteriaLiter = 6
-
+                    criteriaLiter = 0
 
                 totalForbiddenCount = 0 # 6. Количество матерных постов
                 totalGFWordCount = 0 # 6+ Количество постов по теме PR менеджемента
@@ -332,11 +340,11 @@ def getInfoFromVK(userID: str, serviceToken, userToken, type):
                 result[2].append(f"Общее кол-во релевантных постов: {totalGFWordCount}")
 
                 # Оценка дивиации
-                if totalForbiddenCount / numPosts > 0.15:
-                    if totalForbiddenCount / numPosts > 0.25:
-                        criteriaRedFlag += 2
+                if totalForbiddenCount / numPosts > 0:
+                    if totalForbiddenCount / numPosts > 0.1:
+                        criteriaRedFlag += 6
                     else:
-                        criteriaRedFlag += 1
+                        criteriaRedFlag += 4
 
                 # Оценка сосредоточенности Вовлеченность
                 if totalGFWordCount > minRelPostNum:
@@ -354,11 +362,11 @@ def getInfoFromVK(userID: str, serviceToken, userToken, type):
                 result[1].append(f"Общее кол-во экстремистских слов в постах: {totalForbiddenCount}")
 
                 # Оценка дивиации
-                if totalForbiddenCount / totalWords > 0.05:
-                    if totalForbiddenCount / totalWords > 0.15:
-                        criteriaRedFlag += 2
+                if totalForbiddenCount / totalWords > 0.01:
+                    if totalForbiddenCount / totalWords > 0.05:
+                        criteriaRedFlag += 6
                     else:
-                        criteriaRedFlag += 1
+                        criteriaRedFlag += 4
 
                 # 8. Количество слов-угроз в постах
                 totalForbiddenCount = 0
@@ -367,11 +375,11 @@ def getInfoFromVK(userID: str, serviceToken, userToken, type):
                     totalForbiddenCount += forbiddenCount
                 result[1].append(f"Общее кол-во слов-угроз в постах: {totalForbiddenCount}")
                 # Оценка дивиации
-                if totalForbiddenCount / totalWords > 0.05:
-                    if totalForbiddenCount / totalWords > 0.15:
-                        criteriaRedFlag += 2
+                if totalForbiddenCount / totalWords > 0:
+                    if totalForbiddenCount / totalWords > 0.05:
+                        criteriaRedFlag += 6
                     else:
-                        criteriaRedFlag += 1
+                        criteriaRedFlag += 4
             else:
                 # Если слов все-таки нет
                 result[0].append(f"Отсутствуют текстовые посты")
@@ -392,7 +400,7 @@ def getInfoFromVK(userID: str, serviceToken, userToken, type):
     vk = getVKSession(userToken)
     themes = getGroupsTheme(vk, userID) #Топ 5 тематик пользователя
 
-    totalGFWordTheme = 0  # Количество тематик по теме PR менеджемента
+    totalGFWordTheme = 0  # Количество тематик релевантных
     searcRes = WordsSearch(themes, totalGFWordTheme, 0, type)
     totalGFWordTheme = searcRes[1]
     #Оценка концентрации
@@ -418,21 +426,71 @@ def getInfoFromVK(userID: str, serviceToken, userToken, type):
     dataDB.append(criteriaConcen)
     dataDB.append(criteriaRedFlag)
 
-    if criteriaRedFlag <= 2:
+    if criteriaRedFlag <= 5:
+        #Полностью рекомендую
         if criteriaCommun > 4 and criteriaLiter > 4 and criteriaActivity > 4 and criteriaConcen > 4:
-            text = "ВЫСОКО РЕКОМЕНДУЮ на основании:\n Общительность,Грамотность,Активность,Вовлеченность - на высшем уровне"
+            text = "ПОЛНОСТЬЮ РЕКОМЕНДУЮ на основании:\n> Общительность, Грамотность, Активность, Вовлеченность - на высшем уровне"
             result[3].append(text)
             dataDB.append(text)
-        elif criteriaCommun > 2 and criteriaLiter > 2 and criteriaActivity > 2 and criteriaConcen > 2:
-            text = "РЕКОМЕНДУЮ на основании:\n Общительность,Грамотность,Активность,Вовлеченность - на высоком/среднем уровне"
+        #Рекомендую
+        elif criteriaCommun > 2 and criteriaLiter > 2 and criteriaRedFlag <= 2:
+            text = "РЕКОМЕНДУЮ на основании:\n> Общительность, Грамотность - на высоком/среднем уровне"
             result[3].append(text)
             dataDB.append(text)
+        elif criteriaActivity > 2 and criteriaConcen > 2 and criteriaRedFlag <= 2:
+            text = "РЕКОМЕНДУЮ на основании:\n> Активность, Вовлеченность - на высоком/среднем уровне"
+            result[3].append(text)
+            dataDB.append(text)
+        elif criteriaCommun > 2 and criteriaActivity > 2 and criteriaRedFlag <= 2:
+            text = "РЕКОМЕНДУЮ на основании:\n> Общительность, Активность- на высоком/среднем уровне"
+            result[3].append(text)
+            dataDB.append(text)
+        elif criteriaCommun > 2 and criteriaConcen > 2 and criteriaRedFlag <= 2:
+            text = "РЕКОМЕНДУЮ на основании:\n> Общительность, Вовлеченность - на высоком/среднем уровне"
+            result[3].append(text)
+            dataDB.append(text)
+        elif criteriaLiter > 2 and criteriaActivity > 2 and criteriaRedFlag <= 2:
+            text = "РЕКОМЕНДУЮ на основании:\n> Грамотность,Активность - на высоком/среднем уровне"
+            result[3].append(text)
+            dataDB.append(text)
+        elif criteriaLiter > 2 and criteriaConcen > 2 and criteriaRedFlag <= 2:
+            text = "РЕКОМЕНДУЮ на основании:\n> Грамотность, Вовлеченность - на высоком/среднем уровне"
+            result[3].append(text)
+            dataDB.append(text)
+        # Рекомендую, НО
+        elif criteriaCommun > 2 and criteriaLiter > 2 and criteriaRedFlag <= 2:
+            text = "РЕКОМЕНДУЮ на основании:\n> Общительность, Грамотность - на высоком/среднем уровне\n> ! ОБРАТИТЕ ВНИМАНИЕ, СРЕДНИЙ УРОВЕНЬ ДИВИАЦИИ !"
+            result[3].append(text)
+            dataDB.append(text)
+        elif criteriaActivity > 2 and criteriaConcen > 2 and criteriaRedFlag <= 2:
+            text = "РЕКОМЕНДУЮ на основании:\n> Активность, Вовлеченность - на высоком/среднем уровне\n> ! ОБРАТИТЕ ВНИМАНИЕ. СРЕДНИЙ УРОВЕНЬ ДИВИАЦИИ !"
+            result[3].append(text)
+            dataDB.append(text)
+        elif criteriaCommun > 2 and criteriaActivity > 2 and criteriaRedFlag <= 2:
+            text = "РЕКОМЕНДУЮ на основании:\n> Общительность, Активность- на высоком/среднем уровне\n> ! ОБРАТИТЕ ВНИМАНИЕ, СРЕДНИЙ УРОВЕНЬ ДИВИАЦИИ !"
+            result[3].append(text)
+            dataDB.append(text)
+        elif criteriaCommun > 2 and criteriaConcen > 2 and criteriaRedFlag <= 2:
+            text = "РЕКОМЕНДУЮ на основании:\n> Общительность, Вовлеченность - на высоком/среднем уровне\n> ! ОБРАТИТЕ ВНИМАНИЕ, СРЕДНИЙ УРОВЕНЬ ДИВИАЦИИ !"
+            result[3].append(text)
+            dataDB.append(text)
+        elif criteriaLiter > 2 and criteriaActivity > 2 and criteriaRedFlag <= 2:
+            text = "РЕКОМЕНДУЮ на основании:\n> Грамотность,Активность - на высоком/среднем уровне\n> ! ОБРАТИТЕ ВНИМАНИЕ, СРЕДНИЙ УРОВЕНЬ ДИВИАЦИИ !"
+            result[3].append(text)
+            dataDB.append(text)
+        elif criteriaLiter > 2 and criteriaConcen > 2 and criteriaRedFlag <= 2:
+            text = "РЕКОМЕНДУЮ на основании:\n> Грамотность, Вовлеченность - на высоком/среднем уровне\n> ! ОБРАТИТЕ ВНИМАНИЕ, СРЕДНИЙ УРОВЕНЬ ДИВИАЦИИ !"
+            result[3].append(text)
+            dataDB.append(text)
+        # Не рекомендую
         else:
             text = "НЕ РЕКОМЕНДУЮ на основании отсутвия необходимых качеств"
             result[3].append(text)
             dataDB.append(text)
     else:
+        # Не рекомендую
         result[3].append(f"НЕ РЕКОМЕНДУЮ на основании слишком высокой степени Дивиации")
+
     result[3].append("Не забудьте заглянуть в тест Люшера!")
     result[0].append("--- %s секунд на анализ профиля ---" % (int(time.time() - startTime)))
     dataDB.append(f'https://vk.com/id{userID}')
