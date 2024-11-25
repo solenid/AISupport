@@ -1,11 +1,12 @@
 import re
 from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QApplication, QWidget, QVBoxLayout, QLabel, QRadioButton, QCheckBox, QPushButton, \
-    QGridLayout, QDialog, QLineEdit, QTextEdit
+    QGridLayout, QDialog, QLineEdit, QTextEdit, QComboBox, QMessageBox
 from PyQt6.QtGui import QIcon
 from Authorization import *  # Убедитесь, что этот импорт корректен
 #Для асинхронности
 import threading
+import json
 import asyncio
 import TestLusher as tL
 from HistoryWindow import *
@@ -17,8 +18,6 @@ dataForRedFlag = [""]
 dataForGreenFlag = [""]
 dataForRecommend = [""]
 dataForTestLusher = [""]
-
-
 serviceToken = getToken()
 
 def extractIdentifier(vkURL):
@@ -79,9 +78,9 @@ class authPage(QWidget):  # Исправил название класса на 
 
         self.button.clicked.connect(self.authorization)
 
-    def show_TestPage(self):
-        self.TestPage = TestPage()
-        self.TestPage.show()
+    def show_optionsPage(self):
+        self.optionsPage = OptionsPage()
+        self.optionsPage.show()
         self.close()  # Закрываем текущее окно
 
 
@@ -95,56 +94,27 @@ class authPage(QWidget):  # Исправил название класса на 
             myDi.exec()  # Показываем диалог
             return
         print(userToken)
-        self.show_TestPage()
+        self.show_optionsPage()
 
 
 class TestPage(QWidget):  # Исправил название класса на TestPage
-    def __init__(self):  # Исправил метод на __init__
+    def __init__(self, userID, InputTypeProf):  # Исправил метод на __init__
         super().__init__()  # Исправил вызов супер-класса
         self.setWindowTitle('HR SOLUTION')
         self.resize(1000, 600)  # Установите размер окна здесь
         self.setStyleSheet("""
             background-color: #ffffff;
         """)
+        self.userID = userID
+        self.typeProf = InputTypeProf
+        print(f"userID => {self.userID}")
+        print(f"typeProf => {self.typeProf}")
 
         self.layout = QGridLayout(self)  # Используйте self вместо window
         self.layout.setContentsMargins(5, 5, 5, 5)
         self.layout.setSpacing(0)
         self.layout.setAlignment(Qt.AlignmentFlag.AlignTop)
-
-        self.inputText = QLineEdit()
-        self.inputText.setStyleSheet("""
-            font-size: 22px;
-            background-color: #ffffff;
-            color: #000000;
-            font-weight: bold;
-            border: 0.5px solid #D53032; /* Граница кнопки */
-            border-radius: 5px; /* Скругление углов */
-        """)
-        self.layout.addWidget(self.inputText, 0, 0)
-        self.label = QLabel("вставьте ссылку кандидата")
-        self.label.setStyleSheet("""
-            font-size: 18px;
-            background-color: #ffffff;
-            color: #000000;
-        """)
-        self.layout.addWidget(self.label, 1, 0)
-
-        self.button = QPushButton("Начать анализ")
-        self.button.setStyleSheet("""
-            background-color: #D53032;
-            color: #ffffff;
-            font-size:24px;
-            font-style: italic;
-            margin:0px 0px 0px 10px;
-            padding: 1px 50px 1px 50px; /* Отступы внутри кнопки */
-            border: 0.5px solid #D53032; /* Граница кнопки */
-            border-radius: 5px; /* Скругление углов */
-        """)
-        self.layout.addWidget(self.button, 0, 1, 1, 3)
-        self.button.clicked.connect(self.onTap)
         self.buttons = []
-
 
         self.buttonCommonInfo = QPushButton("Общая информация")
         self.buttonCommonInfo.setStyleSheet("""
@@ -161,7 +131,7 @@ class TestPage(QWidget):  # Исправил название класса на 
             border-radius: 1px; /* Скругление углов */
             cursor: pointer;
         """)
-        self.layout.addWidget(self.buttonCommonInfo, 2, 0)
+        self.layout.addWidget(self.buttonCommonInfo, 0, 0)
         self.buttons.append(self.buttonCommonInfo)
 
         self.buttonRedFlag = QPushButton("RED FLAGs")
@@ -179,7 +149,7 @@ class TestPage(QWidget):  # Исправил название класса на 
             border-radius: 1px; /* Скругление углов */
             cursor: pointer;
         """)
-        self.layout.addWidget(self.buttonRedFlag, 2, 1)
+        self.layout.addWidget(self.buttonRedFlag, 0, 1)
         self.buttons.append(self.buttonRedFlag)
 
         self.buttonGreenFlag = QPushButton("GREEN FLAGs")
@@ -197,7 +167,7 @@ class TestPage(QWidget):  # Исправил название класса на 
             border-radius: 1px; /* Скругление углов */
             cursor: pointer;
         """)
-        self.layout.addWidget(self.buttonGreenFlag, 2, 2)
+        self.layout.addWidget(self.buttonGreenFlag, 0, 2)
         self.buttons.append(self.buttonGreenFlag)
 
         self.buttonTestLusher = QPushButton("ТЕСТ ЛЮШЕРА")
@@ -215,7 +185,7 @@ class TestPage(QWidget):  # Исправил название класса на 
             border-radius: 1px; /* Скругление углов */
             cursor: pointer;
         """)
-        self.layout.addWidget(self.buttonTestLusher, 2, 3)
+        self.layout.addWidget(self.buttonTestLusher, 0, 3)
         self.buttons.append(self.buttonTestLusher)
 
         self.buttonRecommendAI = QPushButton("Рекомендации AI")
@@ -233,7 +203,7 @@ class TestPage(QWidget):  # Исправил название класса на 
             border-radius: 1px; /* Скругление углов */
             cursor: pointer;
         """)
-        self.layout.addWidget(self.buttonRecommendAI, 3, 0, 2, 4)
+        self.layout.addWidget(self.buttonRecommendAI, 1, 0, 2, 4)
         self.buttons.append(self.buttonRecommendAI)
 
 
@@ -257,7 +227,7 @@ class TestPage(QWidget):  # Исправил название класса на 
             color:#000000;
             border: 2px solid #D53032; /* Граница кнопки */
         """)
-        self.layout.addWidget(self.output, 4, 0, 5, 5)
+        self.layout.addWidget(self.output, 3, 0, 5, 5)
         self.output.hide()  # Скрываем текстовое поле
 
         self.buttonHistory = QPushButton("История")
@@ -275,7 +245,7 @@ class TestPage(QWidget):  # Исправил название класса на 
             border-radius: 1px; /* Скругление углов */
             cursor: pointer;
         """)
-        self.layout.addWidget(self.buttonHistory, 5, 0)
+        self.layout.addWidget(self.buttonHistory, 4, 0)
         self.buttons.append(self.buttonHistory)
         self.buttonHistory.clicked.connect(self.clickHistory)
 
@@ -324,21 +294,16 @@ class TestPage(QWidget):  # Исправил название класса на 
         show_history()
 
     def runAsyncTasks(self):
-        userID = self.inputText.text().strip()
-        userID = extractIdentifier(userID)
-        userID = getNumericID(userID, serviceToken)
+        # userID = self.inputText.text().strip()
+        self.userID = extractIdentifier(self.userID)
+        self.userID = getNumericID(self.userID, serviceToken)
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
         loop.run_until_complete(asyncio.gather(
-            self.analyze(userID),
-            self.lysher(userID),
+            self.analyze(self.userID),
+            self.lysher(self.userID),
         ))
-        self.button.setEnabled(True)
-
-
-
     def onTap(self):
-        self.button.setEnabled(False)
         t1 = threading.Thread(target=self.runAsyncTasks, daemon=True)
         t1.start()
 
@@ -356,11 +321,153 @@ class TestPage(QWidget):  # Исправил название класса на 
 
     # Функция для запуска Анализа
     async def analyze(self, IDuser):
-        self.update_output(getInfoFromVK(IDuser, serviceToken, userToken))
+        self.update_output(getInfoFromVK(IDuser, serviceToken, userToken, self.typeProf))
 
     # Функция для запуска теста Люшера
     async def lysher(self, IDuser):
         self.update_output2(tL.startTestLusher(IDuser))
+    def showEvent(self, event):
+        super().showEvent(event)  # Вызов метода родителя
+        self.onTap()  # Вызов вашей функции
+
+
+
+
+class OptionsPage(QWidget):  # Исправил название класса на optionsPage
+    def __init__(self):  # Исправил метод на __init__
+        super().__init__()  # Исправил вызов супер-класса
+        self.setWindowTitle('HR SOLUTION')
+        self.resize(800, 600)  # Установите размер окна здесь
+        self.setStyleSheet("""
+            background-color: #ffffff;
+        """)
+
+        self.layout = QGridLayout(self)  # Используйте self вместо window
+        self.layout.setContentsMargins(25, 0, 25, 0)
+        self.layout.setSpacing(0)
+        self.layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        self.combobox = QComboBox()
+        # self.icon_people_nature = QIcon('people-animal2.png')
+        # self.icon_people_people = QIcon('people-people.png')
+        # self.icon_people_symbol = QIcon('people-symbol.png')
+        # self.icon_people_tech = QIcon('people-tech.png')
+        # self.icon_people_art = QIcon('people-art.png')
+
+        # Словарь с данными
+        self.data_dict = {
+            'Error': "Произошла ошибка"
+        }
+        self.typeProf = 10
+        self.flagError = 0
+        try:
+            with open('prof.json', 'r', encoding='utf-8') as file:
+                self.data = json.load(file)
+        except FileNotFoundError:
+            self.flagError = 1
+            self.show_error_message("Ошибка: Файл не найден. Убедитесь, что файл 'prof.json' существует.")
+        except json.JSONDecodeError:
+            self.flagError = 1
+            self.show_error_message("Ошибка: Не удалось декодировать JSON. Проверьте правильность формата файла.")
+        except Exception as e:
+            self.flagError = 1
+            self.show_error_message(f"Произошла ошибка: {e}")
+
+        if not self.flagError:
+            # Добавляем элементы в комбобокс
+            for key, values in self.data.items():
+                for value in values:
+                    self.combobox.addItem(value, key)
+        else:
+            self.combobox.addItem(self.data_dict['Error'])
+
+            # Подключаем сигнал изменения текущего индекса к слоту
+        self.combobox.currentIndexChanged.connect(self.on_combobox_changed)
+        self.layout.addWidget(self.combobox, 0, 0)
+
+
+        self.combobox.setStyleSheet("""
+            font-size: 22px;
+            background-color: #ffffff;
+            color: #000000;
+            font-weight: bold;
+            padding: 5px 0px 5px 10px; /* Отступы внутри кнопки */
+            border: 0.5px solid #D53032; /* Граница кнопки */
+            border-radius: 5px; /* Скругление углов */
+        """)
+
+        self.inputText = QLineEdit()
+        self.inputText.setStyleSheet("""
+            font-size: 22px;
+            background-color: #ffffff;
+            color: #000000;
+            font-weight: bold;
+            border: 0.5px solid #D53032; /* Граница кнопки */
+            border-radius: 5px; /* Скругление углов */
+        """)
+        self.layout.addWidget(self.inputText, 2, 0)
+        self.label = QLabel("вставьте ссылку кандидата")
+        self.label.setStyleSheet("""
+            font-size: 18px;
+            background-color: #ffffff;
+            color: #000000;
+        """)
+        self.layout.addWidget(self.label, 1, 0)
+
+        self.button = QPushButton("Начать анализ")
+        self.button.setStyleSheet("""
+                    background-color: #D53032;
+                    color: #ffffff;
+                    font-size:24px;
+                    font-style: italic;
+                    margin:10px 0px 0px 0px;
+                    padding: 1px 50px 1px 50px; /* Отступы внутри кнопки */
+                    border: 0.5px solid #D53032; /* Граница кнопки */
+                    border-radius: 5px; /* Скругление углов */
+                """)
+        self.layout.addWidget(self.button, 3, 0)
+        self.button.clicked.connect(self.show_TestPage)
+
+    def show_TestPage(self):
+        InputUserId = self.inputText.text().strip()
+        InputTypeProf = int(self.typeProf)
+        if InputTypeProf == 10:
+            self.showInfoMessage("Вы не выбрали профессию!")
+        else:
+            self.TestPage = TestPage(InputUserId, InputTypeProf)
+            self.TestPage.show()
+            self.close()  # Закрываем текущее окно
+
+    def on_combobox_changed(self, index):
+        # Получаем ключ выбранного элемента
+        self.typeProf = self.combobox.itemData(index)  # Это ключ из словаря
+        value = self.combobox.currentText()   # Это отображаемое значение
+        print(f'Выбранный элемент: {value}, Ключ: {self.typeProf}')
+
+    def show_error_message(self, message):
+        msg_box = QMessageBox()
+        msg_box.setIcon(QMessageBox.Icon.Critical)
+        msg_box.setText("Произошла ошибка!")
+        msg_box.setInformativeText(message)
+        msg_box.setWindowTitle("Ошибка")
+        # Показать сообщение и дождаться закрытия
+        msg_box.exec()
+
+        # Закрыть главное окно после закрытия QMessageBox
+        self.close()
+
+    def showInfoMessage(self, message):
+        msg_box = QMessageBox()
+        msg_box.setIcon(QMessageBox.Icon.Information)
+        msg_box.setText("Инфо!")
+        msg_box.setInformativeText(message)
+        msg_box.setWindowTitle("Информация")
+        # Показать сообщение и дождаться закрытия
+        msg_box.exec()
+
+        # Закрыть главное окно после закрытия QMessageBox
+        self.close()
+
 
 
 
@@ -379,5 +486,13 @@ if __name__ == '__main__':  # Исправил на __name__ == '__main__'
     # )
     # testP2.resize(800, 600)
     # testP2.show()
+
+
+    # testP3 = OptionsPage()  # Исправил на TestPage
+    # testP3.setStyleSheet(
+    #     "background-color: #ffffff; "
+    # )
+    # testP3.resize(800, 600)
+    # testP3.show()
 
     exit(app.exec())

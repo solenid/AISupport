@@ -50,7 +50,16 @@ def predictGreenWordSentence(modelGreen,tokeniGreen,sentence):
 # и если находит слово-триггер сразу записывает пост в релевантные
 # + теперь смотрим пост на наличие матов, там жесткий отбор, так что нет надобности по каждому слову
 def WordsSearch(postTexts, countGreen, countRed, type):
-    if type == 0:
+
+    #--------------------------------------------------------------------
+    if type == -1:
+        # Загрузка модели для полезных слов
+        modelGreen = tf.keras.models.load_model('AiModel/modelGreenFlagPRManager.keras')
+        # Загрузка токенизатора для полезных слов
+        with open('AiModel/tokenizerForPRManager.pkl', 'rb') as handle:
+            tokeniGreen = pickle.load(handle)
+    # --------------------------------------------------------------------
+    elif type == 0:
         # Загрузка модели для полезных слов
         modelGreen = tf.keras.models.load_model('AiModel/modelNature.keras')
         # Загрузка токенизатора для полезных слов
@@ -81,7 +90,7 @@ def WordsSearch(postTexts, countGreen, countRed, type):
         with open('AiModel/tokenizerForArt.pkl', 'rb') as handle:
             tokeniGreen = pickle.load(handle)
     else:
-        printf("!!! ОШИБКА ПОИСКА СЛОВ, НЕИЗВЕСТНЫЙ ТИП ЧЕЛОВЕКА")
+        print("!!! ОШИБКА ПОИСКА СЛОВ, НЕИЗВЕСТНЫЙ ТИП ЧЕЛОВЕКА")
         exit()
 
     redFlag = False
@@ -94,10 +103,10 @@ def WordsSearch(postTexts, countGreen, countRed, type):
                     redFlag = True
             if not greenFlag:
                 if predictGreenWordSentence(modelGreen, tokeniGreen,textsPart):
-                    print(f"ПОДОЗРЕНИЕ на pr - {textsPart}") #ОТЛАДКА!#ОТЛАДКА!#ОТЛАДКА!#ОТЛАДКА!#ОТЛАДКА!#ОТЛАДКА!#ОТЛАДКА!#ОТЛАДКА!#ОТЛАДКА!
+                    print(f"ПОДОЗРЕНИЕ на GreenFlag - {textsPart}") #ОТЛАДКА!#ОТЛАДКА!#ОТЛАДКА!#ОТЛАДКА!#ОТЛАДКА!#ОТЛАДКА!#ОТЛАДКА!#ОТЛАДКА!#ОТЛАДКА!
                     for word in textsPart.split():
-                        if predictGreenWordSentence(word):
-                            print(f"PR слово - {word}") #ОТЛАДКА!#ОТЛАДКА!#ОТЛАДКА!#ОТЛАДКА!#ОТЛАДКА!#ОТЛАДКА!#ОТЛАДКА!#ОТЛАДКА!#ОТЛАДКА!
+                        if predictGreenWordSentence(modelGreen, tokeniGreen, word):
+                            print(f"GreenFlag слово - {word}") #ОТЛАДКА!#ОТЛАДКА!#ОТЛАДКА!#ОТЛАДКА!#ОТЛАДКА!#ОТЛАДКА!#ОТЛАДКА!#ОТЛАДКА!#ОТЛАДКА!
                             greenFlag = True
                             break
             if greenFlag and redFlag:
