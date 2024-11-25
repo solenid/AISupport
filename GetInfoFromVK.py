@@ -152,7 +152,7 @@ def getInfoFromVK(userID: str, serviceToken, userToken, type):
         greatAComNum = 45
         midALikeNum = 40
         greatALikeNum = 90
-    elif type == 1: #Человек человек
+    elif type == 1 or type == -1: #Человек человек (Здесь находится наш основной путь PR)
         # Ш-Общительность
         midSFrNum = 100
         greatSFrNum = 200
@@ -237,7 +237,6 @@ def getInfoFromVK(userID: str, serviceToken, userToken, type):
         midALikeNum = 125
         greatALikeNum = 175
     else:
-        print("Ти кто?")
         print("Неопределенный тип пользователя!")
         exit()
 
@@ -260,22 +259,18 @@ def getInfoFromVK(userID: str, serviceToken, userToken, type):
     friendsNum = getNumberOfFriends(vk, userID)
     if friendsNum is not None:
         result[0].append(f"Количество друзей пользователя: {friendsNum}")
-        dataDB.append(friendsNum)
         #Оценка общительности
         if friendsNum > midSFrNum:
             if friendsNum > greatSFrNum:
                 criteriaCommun += 6
             else:
                 criteriaCommun += 3
-    else:
-        dataDB.append(friendsNum)
 
 
     # 2. Получение кол-ва постов за год
     posts = getPostsForLastYear(vk, userID)
     numPosts = len(posts)
     result[0].append(f"Всего постов за год: {numPosts}")
-    dataDB.append(numPosts)
     if numPosts > 0:
 
         # Оценка Активности
@@ -288,7 +283,6 @@ def getInfoFromVK(userID: str, serviceToken, userToken, type):
         # 3. Общее количество комментариев за год
         totalComments = getTotalComments(posts)
         result[0].append(f"Общее количество комментариев за год: {totalComments}")
-        dataDB.append(totalComments)
         # Оценка Активности (общ)
         if totalComments > (midAComNum):
             if totalComments > (greatAComNum):
@@ -299,7 +293,6 @@ def getInfoFromVK(userID: str, serviceToken, userToken, type):
         # 4. Общее количество лайков за год
         totalLikes = getTotalLikes(posts)
         result[0].append(f"Общее количество лайков за год: {totalLikes}")
-        dataDB.append(totalLikes)
 
         # Оценка Активность  (общ)
         if totalLikes > (midALikeNum):
@@ -322,7 +315,6 @@ def getInfoFromVK(userID: str, serviceToken, userToken, type):
             #!Если есть текст в постах СНОВА????????
             if (totalWords) > 0:
                 result[1].append(f"Общее кол-во постов за год, содержащие грамматические ошибки : {errCount}")
-                dataDB.append(errCount)
                 #Оценка грамотности (точности)
                 if (errCount) != 0:
                     if errCount/totalWords < 0.1:
@@ -337,7 +329,6 @@ def getInfoFromVK(userID: str, serviceToken, userToken, type):
                 totalForbiddenCount = searcRes[0]
                 totalGFWordCount = searcRes[1]
                 result[1].append(f"Общее кол-во матерных постов: {totalForbiddenCount}")
-                dataDB.append(totalForbiddenCount)
                 result[2].append(f"Общее кол-во релевантных постов: {totalGFWordCount}")
 
                 # Оценка дивиации
@@ -354,13 +345,13 @@ def getInfoFromVK(userID: str, serviceToken, userToken, type):
                     else:
                         criteriaConcen += 1.5
 
+
                 # 7. Количество экстремистких слов в постах
                 totalForbiddenCount = 0
                 for text in postsText:
                     forbiddenCount = countExtremismWords(text)
                     totalForbiddenCount += forbiddenCount
                 result[1].append(f"Общее кол-во экстремистских слов в постах: {totalForbiddenCount}")
-                dataDB.append(totalForbiddenCount)
 
                 # Оценка дивиации
                 if totalForbiddenCount / totalWords > 0.05:
@@ -375,7 +366,6 @@ def getInfoFromVK(userID: str, serviceToken, userToken, type):
                     forbiddenCount = countThreatWords(text)
                     totalForbiddenCount += forbiddenCount
                 result[1].append(f"Общее кол-во слов-угроз в постах: {totalForbiddenCount}")
-                dataDB.append(totalForbiddenCount)
                 # Оценка дивиации
                 if totalForbiddenCount / totalWords > 0.05:
                     if totalForbiddenCount / totalWords > 0.15:
@@ -383,32 +373,17 @@ def getInfoFromVK(userID: str, serviceToken, userToken, type):
                     else:
                         criteriaRedFlag += 1
             else:
-                dataDB.append(0)
-                dataDB.append(0)
-                dataDB.append(0)
-                dataDB.append(0)
                 # Если слов все-таки нет
                 result[0].append(f"Отсутствуют текстовые посты")
                 criteriaConcen = -1
                 criteriaRedFlag = -1
                 criteriaLiter = -1
         else:
-            dataDB.append(0)
-            dataDB.append(0)
-            dataDB.append(0)
-            dataDB.append(0)
             result[0].append(f"Отсутствуют текстовые посты")
             criteriaConcen = -1
             criteriaRedFlag = -1
             criteriaLiter = -1
     else:
-        dataDB.append(0)
-        dataDB.append(0)
-        dataDB.append(0)
-        dataDB.append(0)
-        dataDB.append(0)
-        dataDB.append(0)
-
         result[0].append(f"Отсутствуют посты")
         criteriaConcen = -1
         criteriaRedFlag = -1
@@ -430,64 +405,44 @@ def getInfoFromVK(userID: str, serviceToken, userToken, type):
     result[0].append("Топ 5 тематик групп пользователя:")
     for theme in themes [:5]:
         result[0].append(f"- {theme}")
-    dataDB.append(themes[0])
-    dataDB.append(55)
-    dataDB.append('https://vk.com/h0w_to_survive')
 
-    addUser(dataDB[0],dataDB[1],dataDB[2],dataDB[3],dataDB[4],
-            dataDB[5],dataDB[6],dataDB[7],dataDB[8],dataDB[9],
-            dataDB[10],dataDB[11],dataDB[12], dataDB[13])
-    dataDB.clear()
     #10 ОЦЕНКА пользователя
     result[2].append(f"Общительность: {getCriteriaGrade(criteriaCommun)}")
     result[2].append(f"Грамотность: {getCriteriaGrade(criteriaLiter)}")
     result[2].append(f"Активность: {getCriteriaGrade(criteriaActivity)}")
     result[2].append(f"Вовлеченность: {getCriteriaGrade(criteriaConcen)}")
     result[1].append(f"Степень дивиации: {getCriteriaGrade(criteriaRedFlag)}")
+    dataDB.append(criteriaCommun)
+    dataDB.append(criteriaLiter)
+    dataDB.append(criteriaActivity)
+    dataDB.append(criteriaConcen)
+    dataDB.append(criteriaRedFlag)
 
     if criteriaRedFlag <= 2:
         if criteriaCommun > 4 and criteriaLiter > 4 and criteriaActivity > 4 and criteriaConcen > 4:
-            result[3].append(f"ВЫСОКО РЕКОМЕНДУЮ на основании:\n Общительность,Грамотность,Активность,Вовлеченность - на высшем уровне")
-        elif (criteriaCommun > 4 and criteriaLiter > 4):
-            result[3].append(f"РЕКОМЕНДУЮ на основании:\n Общительность,Грамотность - на высшем уровне")
-        elif (criteriaCommun > 4 and criteriaConcen > 4):
-            result[3].append(f"РЕКОМЕНДУЮ на основании:\n Общительность,Вовлеченность - на высшем уровне")
-        elif (criteriaCommun > 4 and criteriaActivity > 4):
-            result[3].append(f"РЕКОМЕНДУЮ на основании:\n Общительность,Активность - на высшем уровне")
-        elif (criteriaActivity > 4 and criteriaConcen > 4):
-            result[3].append(f"РЕКОМЕНДУЮ на основании:\n Активность,Вовлеченность - на высшем уровне")
-        elif (criteriaActivity > 4 and criteriaLiter > 4):
-            result[3].append(f"РЕКОМЕНДУЮ на основании:\n Активность,Грамотность - на высшем уровне")
-        elif (criteriaConcen > 4 and criteriaLiter > 4):
-            result[3].append(f"РЕКОМЕНДУЮ на основании:\n Вовлеченность,Грамотность - на высшем уровне")
-        elif (criteriaCommun > 4 or criteriaActivity > 4 or criteriaConcen > 4):
-            if criteriaCommun > 4:
-                result[3].append(f"Стоит обратить внимание так как Общительность - на высшем уровне")
-            if criteriaActivity > 4:
-                result[3].append(f"Стоит обратить внимание так как Активность - на высшем уровне")
-            if criteriaConcen > 4:
-                result[3].append(f"Стоит обратить внимание так как Вовлеченность - на высшем уровне")
+            text = "ВЫСОКО РЕКОМЕНДУЮ на основании:\n Общительность,Грамотность,Активность,Вовлеченность - на высшем уровне"
+            result[3].append(text)
+            dataDB.append(text)
         elif criteriaCommun > 2 and criteriaLiter > 2 and criteriaActivity > 2 and criteriaConcen > 2:
-            result[3].append("Кандидат обладает средниими показателями, ему есть куда расти")
+            text = "РЕКОМЕНДУЮ на основании:\n Общительность,Грамотность,Активность,Вовлеченность - на высоком/среднем уровне"
+            result[3].append(text)
+            dataDB.append(text)
         else:
-            result[3].append("НЕ РЕКОМЕНДУЮ на основании отсутвия необходимых качеств (Они на среднем-низком уровне)")
+            text = "НЕ РЕКОМЕНДУЮ на основании отсутвия необходимых качеств"
+            result[3].append(text)
+            dataDB.append(text)
     else:
-        if criteriaCommun > 4 and criteriaLiter > 4 and criteriaActivity > 4 and criteriaConcen > 4:
-            result[3].append(f"РЕКОМЕНДУЮ на основании:\n Общительность,Грамотность,Активность,Вовлеченность - на высшем уровне\n !Следует обратить внимание на высокую степень дивиации!")
-        elif (criteriaCommun > 4 and criteriaLiter > 4):
-            result[3].append(f"Стоит обратить внимание так как Общительность,Грамотность - на высшем уровне\n !ВНИМАНИЕ высокая степень дивиации!")
-        elif (criteriaCommun > 4 and criteriaConcen > 4):
-            result[3].append(f"Стоит обратить внимание так как Общительность,Вовлеченность - на высшем уровне\n !ВНИМАНИЕ высокая степень дивиации!")
-        elif (criteriaCommun > 4 and criteriaActivity > 4):
-            result[3].append(f"Стоит обратить внимание так как Общительность,Активность - на высшем уровне\n !ВНИМАНИЕ высокая степень дивиации!")
-        elif (criteriaActivity > 4 and criteriaConcen > 4):
-            result[3].append(f"Стоит обратить внимание так как Активность,Вовлеченность - на высшем уровне\n !ВНИМАНИЕ высокая степень дивиации!")
-        elif (criteriaActivity > 4 and criteriaLiter > 4):
-            result[3].append(f"Стоит обратить внимание так как Активность,Грамотность - на высшем уровне\n !ВНИМАНИЕ высокая степень дивиации!")
-        elif (criteriaConcen > 4 and criteriaLiter > 4):
-            result[3].append(f"Стоит обратить внимание так как Вовлеченность,Грамотность - на высшем уровне\n !ВНИМАНИЕ высокая степень дивиации!")
-        else:
-            result[3].append(f"НЕ РЕКОМЕНДУЮ на основании слишком высокой степени Дивиации")
+        result[3].append(f"НЕ РЕКОМЕНДУЮ на основании слишком высокой степени Дивиации")
     result[3].append("Не забудьте заглянуть в тест Люшера!")
     result[0].append("--- %s секунд на анализ профиля ---" % (int(time.time() - startTime)))
+    dataDB.append(f'https://vk.com/id{userID}')
+    print(dataDB)
+    try:
+        addUser(dataDB[0], dataDB[1], dataDB[2], dataDB[3], dataDB[4],
+                dataDB[5], dataDB[6], dataDB[7], dataDB[8], dataDB[9])
+    except Exception as e:
+        print(f"Произошла ошибка при добавления пользователя в базу данных: {e}")
+    print("Очистка массива ...")
+    dataDB.clear()
+    print("Массив Очищен")
     return result
