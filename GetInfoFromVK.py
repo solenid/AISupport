@@ -142,6 +142,13 @@ def getPhotoCount(vk, userID):
     return resPhotos
 
 def getInfoFromVK(userID: str, serviceToken, userToken, type):
+    # Флаги оценок
+    criteriaCommun = 0  # Общительность
+    criteriaLiter = 0  # Грамотность
+    criteriaConcen = 0  # Концентрация
+    criteriaActivity = 0  # Активность
+    criteriaRedFlag = 0  # Ред флаги
+    #Критерии
     # Грамотность
     midErrNum = 0.1
     greatErrNum = 0.25
@@ -240,12 +247,7 @@ def getInfoFromVK(userID: str, serviceToken, userToken, type):
         print("Неопределенный тип пользователя!")
         exit()
 
-    # Флаги оценок
-    criteriaCommun = 0 # Общительность
-    criteriaLiter = 0 # Грамотность
-    criteriaConcen = 0 # Концентрация
-    criteriaActivity = 0 # Активность
-    criteriaRedFlag = 0 # Ред флаги
+
     result = [["ОБЩАЯ ИНФОРМАЦИЯ: ",f"Используемый user_id: {userID}"], ["RED FLAGs: "],["GREEN FLAGs: "],["Рекомендации:"]] # 0 - общая | 1 - red flags | 2 - green flags
     startTime = time.time()
     vk = getVKSession(serviceToken)
@@ -420,6 +422,7 @@ def getInfoFromVK(userID: str, serviceToken, userToken, type):
     result[2].append(f"Активность: {getCriteriaGrade(criteriaActivity)}")
     result[2].append(f"Вовлеченность: {getCriteriaGrade(criteriaConcen)}")
     result[1].append(f"Степень дивиации: {getCriteriaGrade(criteriaRedFlag)}")
+
     dataDB.append(criteriaCommun)
     dataDB.append(criteriaLiter)
     dataDB.append(criteriaActivity)
@@ -491,8 +494,30 @@ def getInfoFromVK(userID: str, serviceToken, userToken, type):
         # Не рекомендую
         result[3].append(f"НЕ РЕКОМЕНДУЮ на основании слишком высокой степени Дивиации")
 
+
+    #Блок Герчикова
+    #НАДО ПРИДУМАТЬ КУДА ЭТО СКЛАДЫВАТЬ, ВЕРОЯТНО ОТДЕЛЬНАЯ КНОПКА И ОТДЕЛЬНАЯ ВКЛАДКА
+    #НО Я БЫ ПЕРЕИМЕНОВАЛ ВКЛАДКУ С ЛЮЩЕРОМ И ПИСАЛ ТУДА
+    resultGerchikov = ""
+    if criteriaRedFlag > 4:
+        resultGerchikov += "Избегательный тип\nХарактеризуется отсутствием у сотрудника четких ценностей и профессиональных ориентиров. Поощрение и наказание в данном случае могут быть сложными, так как такие сотрудники могут не реагировать на обычные стимулы.\n\n"
+    if criteriaConcen > 4:
+        resultGerchikov += "Профессиональный тип\nХарактеризуется стремлением сотрудника к профессиональному росту и развитию, к приобретению новых знаний и навыков. Поощрением может служить возможность участия в профессиональных семинарах, тренингах, курсах повышения квалификации.\n\n"
+    if gerchikovKeyWords(themes, True) > 3:
+        resultGerchikov += "Инструментальный тип\nСотрудник рассматривает работу как инструмент для достижения определенных целей, таких как материальное благополучие. Поощрением для таких сотрудников может стать премия, бонус или повышение зарплаты.\n\n"
+    if numPosts > 0:
+        if totalWords > 0:
+            if gerchikovKeyWords(postsText, False) > 3:
+                resultGerchikov += "Патриотический тип\nОснован на любви сотрудника к своей компании и стремлении приносить ей пользу. Поощрением для таких сотрудников может служить публичное признание их вклада в успех компании, награды за лояльность и долгосрочную службу.\n\n"
+    
+    if len(resultGerchikov) > 0:
+        result[0].append("Тип мотивации по Герчикову:")
+        result[0].append(resultGerchikov)
+
+
     result[3].append("Не забудьте заглянуть в тест Люшера!")
     result[0].append("--- %s секунд на анализ профиля ---" % (int(time.time() - startTime)))
+
     dataDB.append(f'https://vk.com/id{userID}')
     print(dataDB)
     try:
@@ -503,4 +528,6 @@ def getInfoFromVK(userID: str, serviceToken, userToken, type):
     print("Очистка массива ...")
     dataDB.clear()
     print("Массив Очищен")
+
+
     return result
