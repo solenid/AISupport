@@ -154,3 +154,20 @@ def countThreatWords(text: str) -> int:
         return 0
     except Exception:
         return 0
+
+def gerchikovKeyWords(str, subs: bool):
+    result = 0
+    if subs == True:
+        with open('Dictionaries/gerchikovSubs.txt', 'r', encoding='utf-8') as f:
+            keyWords = [line.strip() for line in f.readlines()]
+        for word in str:
+            if word in keyWords:
+                result += 1
+    else:
+        with open('Dictionaries/gerchikovWall.txt', 'r', encoding='utf-8') as f:
+            keyWords = [line.strip() for line in f.readlines()]
+        for text in str:
+            for word in text:
+                if word in keyWords:
+                    result += 1
+    return result
