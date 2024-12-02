@@ -20,6 +20,7 @@ dataForRedFlag = [""]
 dataForGreenFlag = [""]
 dataForRecommend = [""]
 dataForTestLusher = [""]
+dataForTestGerchikov = [""]
 serviceToken = getToken()
 
 
@@ -191,6 +192,24 @@ class TestPage(QWidget):  # Исправил название класса на 
         self.layout.addWidget(self.buttonTestLusher, 0, 3)
         self.buttons.append(self.buttonTestLusher)
 
+        self.buttonTestGerchikova = QPushButton("ТЕСТ ГЕРЧИКОВА")
+        self.buttonTestGerchikova.setStyleSheet("""
+            background-color: #ffffff;
+            color: #D53032;
+            font-size:18px;
+            margin:30px 0px 0px 15px;
+            font-weight: bold;
+            padding: 1px 10px 1px 10px; /* Отступы внутри кнопки */
+            border: 2px solid #D53032; /* Граница кнопки */
+            border-top: none;
+            border-right: none;
+            border-left: none; 
+            border-radius: 1px; /* Скругление углов */
+            cursor: pointer;
+        """)
+        self.layout.addWidget(self.buttonTestGerchikova, 0, 4)
+        self.buttons.append(self.buttonTestGerchikova)
+
         self.buttonRecommendAI = QPushButton("Рекомендации AI")
         self.buttonRecommendAI.setStyleSheet("""
             background-color: #ffffff;
@@ -206,7 +225,7 @@ class TestPage(QWidget):  # Исправил название класса на 
             border-radius: 1px; /* Скругление углов */
             cursor: pointer;
         """)
-        self.layout.addWidget(self.buttonRecommendAI, 1, 0, 2, 4)
+        self.layout.addWidget(self.buttonRecommendAI, 1, 0, 2, 5)
         self.buttons.append(self.buttonRecommendAI)
 
         self.layout.setColumnStretch(0, 2)  # Столбец 0
@@ -219,6 +238,7 @@ class TestPage(QWidget):  # Исправил название класса на 
         self.buttonGreenFlag.clicked.connect(self.clickButtonGreenFlag)
         self.buttonTestLusher.clicked.connect(self.clickButtonTestLusher)
         self.buttonRecommendAI.clicked.connect(self.clickButtonRecommend)
+        self.buttonTestGerchikova.clicked.connect(self.clickButtonGerchikov)
 
         self.output = QTextEdit()
         self.output.setReadOnly(True)  # Делаем поле только для чтения
@@ -290,6 +310,14 @@ class TestPage(QWidget):  # Исправил название класса на 
             self.output.append(i)
         self.output.show()  # Скрываем текстовое поле
 
+    def clickButtonGerchikov(self):
+        if not self.output.isHidden():
+            self.output.hide()  # Скрываем текстовое поле
+        self.output.clear()
+        for i in dataForTestGerchikov:
+            self.output.append(i)
+        self.output.show()  # Скрываем текстовое поле
+
     def clickHistory(self):
         print("History")
         self.HistoryWindow = HistoryWindow()
@@ -320,6 +348,8 @@ class TestPage(QWidget):  # Исправил название класса на 
             dataForGreenFlag.append(i)
         for i in result[3]:
             dataForRecommend.append(i)
+        for i in result[4]:
+            dataForTestGerchikov.append(i)
 
     def update_output2(self, result):
         dataForTestLusher.append(result)
