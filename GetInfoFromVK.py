@@ -248,7 +248,7 @@ def getInfoFromVK(userID: str, serviceToken, userToken, type):
         exit()
 
 
-    result = [["ОБЩАЯ ИНФОРМАЦИЯ: ",f"Используемый user_id: {userID}"], ["RED FLAGs: "],["GREEN FLAGs: "],["Рекомендации:"]] # 0 - общая | 1 - red flags | 2 - green flags
+    result = [["ОБЩАЯ ИНФОРМАЦИЯ: ",f"Используемый user_id: {userID}"], ["RED FLAGs: "],["GREEN FLAGs: "],["Рекомендации:"], ["Тест Герчикова: "]] # 0 - общая | 1 - red flags | 2 - green flags | 3 - рекомендация | 4 - Герчиков
     startTime = time.time()
     vk = getVKSession(serviceToken)
     if vk is None:
@@ -511,8 +511,7 @@ def getInfoFromVK(userID: str, serviceToken, userToken, type):
                 resultGerchikov += "Патриотический тип\nОснован на любви сотрудника к своей компании и стремлении приносить ей пользу. Поощрением для таких сотрудников может служить публичное признание их вклада в успех компании, награды за лояльность и долгосрочную службу.\n\n"
     
     if len(resultGerchikov) > 0:
-        result[0].append("Тип мотивации по Герчикову:")
-        result[0].append(resultGerchikov)
+        result[4].append(resultGerchikov)
 
 
     result[3].append("Не забудьте заглянуть в тест Люшера!")
