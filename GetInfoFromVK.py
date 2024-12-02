@@ -61,7 +61,7 @@ def getGroupsTheme(vk, userID):
                                                                         # ключевые слова ненужных нам тем (строчными)
     offset = 0
     count = 1000
-    while True:
+    while True: # Зачем?
         try:
             response = vk.groups.get(
                 user_id=userID,
