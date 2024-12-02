@@ -30,22 +30,6 @@ def getPostsPhoto(userID: str):
                 resPhotos[0].append(photo)
                 resPhotos[1].append(photoId)
     return resPhotos
-
-def userGetInfo(user_id: str, token, choice):
-    count_posts = 50
-    filter = "owner"
-    offset = 0
-    urlWallGetById = 'https://api.vk.com/method/wall.get'
-    paramsForWallGetById = {
-        'access_token': token,
-        'owner_id': f'{user_id}',
-        'offset': f'{offset}',
-        'count': f'{count_posts}',
-        'filter': f'{filter}',
-        'v': '5.131'  # Версия API
-    }
-    responseForWallGetById = requests.get(urlWallGetById, params=paramsForWallGetById)
-    dataForWallGetById = responseForWallGetById.json()
 # Функция для установки цвета текста с использованием ANSI escape codes
 #def print_rgb(r, g, b, text):
     #print(f"\033[38;2;{r};{g};{b}m{text}\033[0m")
