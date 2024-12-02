@@ -4,9 +4,9 @@ import tensorflow as tf
 import pickle
 
 # Загрузка модели для матов
-modelRed = tf.keras.models.load_model('AiModel/modelBadWords.keras')
+modelRed = tf.keras.models.load_model('AiModel/WordsFinderModels/modelBadWords.keras')
 # Загрузка токенизатора для матов
-with open('AiModel/tokenizerForBadWords.pkl', 'rb') as handle:
+with open('AiModel/WordsFinderModels/tokenizerForBadWords.pkl', 'rb') as handle:
     tokeniRed = pickle.load(handle)
 
 modelGreen = ''
@@ -54,40 +54,40 @@ def WordsSearch(postTexts, countGreen, countRed, type):
     #--------------------------------------------------------------------
     if type == -1:
         # Загрузка модели для полезных слов
-        modelGreen = tf.keras.models.load_model('AiModel/modelGreenFlagPRManager.keras')
+        modelGreen = tf.keras.models.load_model('AiModel/WordsFinderModels/modelGreenFlagPRManager.keras')
         # Загрузка токенизатора для полезных слов
-        with open('AiModel/tokenizerForPRManager.pkl', 'rb') as handle:
+        with open('AiModel/WordsFinderModels/tokenizerForPRManager.pkl', 'rb') as handle:
             tokeniGreen = pickle.load(handle)
     # --------------------------------------------------------------------
     elif type == 0:
         # Загрузка модели для полезных слов
-        modelGreen = tf.keras.models.load_model('AiModel/modelNature.keras')
+        modelGreen = tf.keras.models.load_model('AiModel/WordsFinderModels/modelNature.keras')
         # Загрузка токенизатора для полезных слов
-        with open('AiModel/tokenizerForNature.pkl', 'rb') as handle:
+        with open('AiModel/WordsFinderModels/tokenizerForNature.pkl', 'rb') as handle:
             tokeniGreen = pickle.load(handle)
     elif type == 1:
         # Загрузка модели для полезных слов
-        modelGreen = tf.keras.models.load_model('AiModel/modelHuman.keras')
+        modelGreen = tf.keras.models.load_model('AiModel/WordsFinderModels/modelHuman.keras')
         # Загрузка токенизатора для полезных слов
-        with open('AiModel/tokenizerForHuman.pkl', 'rb') as handle:
+        with open('AiModel/WordsFinderModels/tokenizerForHuman.pkl', 'rb') as handle:
             tokeniGreen = pickle.load(handle)
     elif type == 2:
         # Загрузка модели для полезных слов
-        modelGreen = tf.keras.models.load_model('AiModel/modelSymbol.keras')
+        modelGreen = tf.keras.models.load_model('AiModel/WordsFinderModels/modelSymbol.keras')
         # Загрузка токенизатора для полезных слов
-        with open('AiModel/tokenizerForSymbol.pkl', 'rb') as handle:
+        with open('AiModel/WordsFinderModels/tokenizerForSymbol.pkl', 'rb') as handle:
             tokeniGreen = pickle.load(handle)
     elif type == 3:
         # Загрузка модели для полезных слов
-        modelGreen = tf.keras.models.load_model('AiModel/modelTech.keras')
+        modelGreen = tf.keras.models.load_model('AiModel/WordsFinderModels/modelTech.keras')
         # Загрузка токенизатора для полезных слов
-        with open('AiModel/tokenizerForTech.pkl', 'rb') as handle:
+        with open('AiModel/WordsFinderModels/tokenizerForTech.pkl', 'rb') as handle:
             tokeniGreen = pickle.load(handle)
     elif type == 4:
         # Загрузка модели для полезных слов
-        modelGreen = tf.keras.models.load_model('AiModel/modelArt.keras')
+        modelGreen = tf.keras.models.load_model('AiModel/WordsFinderModels/modelArt.keras')
         # Загрузка токенизатора для полезных слов
-        with open('AiModel/tokenizerForArt.pkl', 'rb') as handle:
+        with open('AiModel/WordsFinderModels/tokenizerForArt.pkl', 'rb') as handle:
             tokeniGreen = pickle.load(handle)
     else:
         print("!!! ОШИБКА ПОИСКА СЛОВ, НЕИЗВЕСТНЫЙ ТИП ЧЕЛОВЕКА")
@@ -154,3 +154,20 @@ def countThreatWords(text: str) -> int:
         return 0
     except Exception:
         return 0
+
+def gerchikovKeyWords(str, subs: bool):
+    result = 0
+    if subs == True:
+        with open('Dictionaries/gerchikovSubs.txt', 'r', encoding='utf-8') as f:
+            keyWords = [line.strip() for line in f.readlines()]
+        for word in str:
+            if word in keyWords:
+                result += 1
+    else:
+        with open('Dictionaries/gerchikovWall.txt', 'r', encoding='utf-8') as f:
+            keyWords = [line.strip() for line in f.readlines()]
+        for text in str:
+            for word in text:
+                if word in keyWords:
+                    result += 1
+    return result
