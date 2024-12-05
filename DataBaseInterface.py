@@ -72,6 +72,8 @@ def getLast5Users():
                         LIMIT 5
                     ''')
         rows = cursor.fetchall()
+        print(rows)
+        print("----------------------------")
         return rows
     except sqlite3.Error as e:
         print(f"Ошибка при получении пользователей: {e}")

@@ -366,7 +366,6 @@ class TestPage(QWidget):  # Исправил название класса на 
         super().showEvent(event)  # Вызов метода родителя
         self.onTap()  # Вызов вашей функции
 
-
 class OptionsPage(QWidget):  # Исправил название класса на optionsPage
     def __init__(self):  # Исправил метод на __init__
         super().__init__()  # Исправил вызов супер-класса
@@ -383,12 +382,6 @@ class OptionsPage(QWidget):  # Исправил название класса н
         self.layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.combobox = QComboBox()
-        # self.icon_people_nature = QIcon('people-animal2.png')
-        # self.icon_people_people = QIcon('people-people.png')
-        # self.icon_people_symbol = QIcon('people-symbol.png')
-        # self.icon_people_tech = QIcon('people-tech.png')
-        # self.icon_people_art = QIcon('people-art.png')
-
         # Словарь с данными
         self.data_dict = {
             'Error': "Произошла ошибка"
@@ -461,7 +454,6 @@ class OptionsPage(QWidget):  # Исправил название класса н
                 """)
         self.layout.addWidget(self.button, 3, 0)
         self.button.clicked.connect(self.show_TestPage)
-
     def show_TestPage(self):
         InputUserId = self.inputText.text().strip()
         InputTypeProf = int(self.typeProf)

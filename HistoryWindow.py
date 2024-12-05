@@ -17,9 +17,14 @@ def get_last_five_scans():
             "scan_id": user[0],
             "first_name": user[2],
             "last_name": user[1],
-            "birth_date": user[3]
+            "birth_date": user[3],
+            "link" : user[10]
         }
+        print(user_dict)
+        print("----------------------------")
         result.append(user_dict)
+    print(users)
+    print("----------------------------")
     return result
 
 columns = ['Дата рождения', 'ID', 'Nickname', 'Рекомендация', '']
@@ -89,7 +94,7 @@ class HistoryWindow(QWidget):
         self.user_details = getUserById(scan['scan_id'])
 
         self.table.setItem(row_position, 0, QTableWidgetItem(scan['birth_date']))
-        self.table.setItem(row_position, 1, QTableWidgetItem(str(scan['scan_id'])))
+        self.table.setItem(row_position, 1, QTableWidgetItem(str(scan['link'])))
         self.table.setItem(row_position, 2, QTableWidgetItem(scan['first_name'] + " " + scan['last_name']))
         self.table.setItem(row_position, 3, QTableWidgetItem(self.user_details[9]))  # scan['СЮДА ТИПО РЕКОМЕНДАЦИЮ']
 
