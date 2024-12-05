@@ -1,10 +1,12 @@
 import re
+
 from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QApplication, QWidget, QVBoxLayout, QLabel, QRadioButton, QCheckBox, QPushButton, \
     QGridLayout, QDialog, QLineEdit, QTextEdit, QComboBox, QMessageBox
 from PyQt6.QtGui import QIcon
+
 from Authorization import *  # Убедитесь, что этот импорт корректен
-#Для асинхронности
+# Для асинхронности
 import threading
 import json
 import asyncio
@@ -18,7 +20,9 @@ dataForRedFlag = [""]
 dataForGreenFlag = [""]
 dataForRecommend = [""]
 dataForTestLusher = [""]
+dataForTestGerchikov = [""]
 serviceToken = getToken()
+
 
 def extractIdentifier(vkURL):
     pattern = r'https?://(?:www\.)?vk\.com/([^/?#&]+)'
@@ -27,6 +31,7 @@ def extractIdentifier(vkURL):
         return match.group(1)
     else:
         return None
+
 
 def getNumericID(userIdentifier, accessToken, apiVersion='5.131'):
     url = 'https://api.vk.com/method/users.get'
@@ -82,7 +87,6 @@ class authPage(QWidget):  # Исправил название класса на 
         self.optionsPage = OptionsPage()
         self.optionsPage.show()
         self.close()  # Закрываем текущее окно
-
 
     def authorization(self):
         global userToken
@@ -188,6 +192,24 @@ class TestPage(QWidget):  # Исправил название класса на 
         self.layout.addWidget(self.buttonTestLusher, 0, 3)
         self.buttons.append(self.buttonTestLusher)
 
+        self.buttonTestGerchikova = QPushButton("ТЕСТ ГЕРЧИКОВА")
+        self.buttonTestGerchikova.setStyleSheet("""
+            background-color: #ffffff;
+            color: #D53032;
+            font-size:18px;
+            margin:30px 0px 0px 15px;
+            font-weight: bold;
+            padding: 1px 10px 1px 10px; /* Отступы внутри кнопки */
+            border: 2px solid #D53032; /* Граница кнопки */
+            border-top: none;
+            border-right: none;
+            border-left: none; 
+            border-radius: 1px; /* Скругление углов */
+            cursor: pointer;
+        """)
+        self.layout.addWidget(self.buttonTestGerchikova, 0, 4)
+        self.buttons.append(self.buttonTestGerchikova)
+
         self.buttonRecommendAI = QPushButton("Рекомендации AI")
         self.buttonRecommendAI.setStyleSheet("""
             background-color: #ffffff;
@@ -203,10 +225,8 @@ class TestPage(QWidget):  # Исправил название класса на 
             border-radius: 1px; /* Скругление углов */
             cursor: pointer;
         """)
-        self.layout.addWidget(self.buttonRecommendAI, 1, 0, 2, 4)
+        self.layout.addWidget(self.buttonRecommendAI, 1, 0, 2, 5)
         self.buttons.append(self.buttonRecommendAI)
-
-
 
         self.layout.setColumnStretch(0, 2)  # Столбец 0
         self.layout.setColumnStretch(1, 1)  # Столбец 1
@@ -218,6 +238,7 @@ class TestPage(QWidget):  # Исправил название класса на 
         self.buttonGreenFlag.clicked.connect(self.clickButtonGreenFlag)
         self.buttonTestLusher.clicked.connect(self.clickButtonTestLusher)
         self.buttonRecommendAI.clicked.connect(self.clickButtonRecommend)
+        self.buttonTestGerchikova.clicked.connect(self.clickButtonGerchikov)
 
         self.output = QTextEdit()
         self.output.setReadOnly(True)  # Делаем поле только для чтения
@@ -254,7 +275,6 @@ class TestPage(QWidget):  # Исправил название класса на 
             self.output.hide()  # Скрываем текстовое поле
         self.output.clear()
         for i in dataForCommonInfo:
-            
             self.output.append(i)
         self.output.show()  # Скрываем текстовое поле
 
@@ -263,17 +283,17 @@ class TestPage(QWidget):  # Исправил название класса на 
             self.output.hide()  # Скрываем текстовое поле
         self.output.clear()
         for i in dataForRedFlag:
-            
             self.output.append(i)
         self.output.show()  # Скрываем текстовое поле
+
     def clickButtonGreenFlag(self):
         if not self.output.isHidden():
             self.output.hide()  # Скрываем текстовое поле
         self.output.clear()
         for i in dataForGreenFlag:
-            
             self.output.append(i)
         self.output.show()  # Скрываем текстовое поле
+
     def clickButtonTestLusher(self):
         if not self.output.isHidden():
             self.output.hide()  # Скрываем текстовое поле
@@ -281,6 +301,7 @@ class TestPage(QWidget):  # Исправил название класса на 
         for i in dataForTestLusher:
             self.output.append(i)
         self.output.show()  # Скрываем текстовое поле
+
     def clickButtonRecommend(self):
         if not self.output.isHidden():
             self.output.hide()  # Скрываем текстовое поле
@@ -289,9 +310,19 @@ class TestPage(QWidget):  # Исправил название класса на 
             self.output.append(i)
         self.output.show()  # Скрываем текстовое поле
 
+    def clickButtonGerchikov(self):
+        if not self.output.isHidden():
+            self.output.hide()  # Скрываем текстовое поле
+        self.output.clear()
+        for i in dataForTestGerchikov:
+            self.output.append(i)
+        self.output.show()  # Скрываем текстовое поле
+
     def clickHistory(self):
         print("History")
-        show_history()
+        self.HistoryWindow = HistoryWindow()
+        self.HistoryWindow.show()
+        # self.close()  # Закрываем текущее окно
 
     def runAsyncTasks(self):
         # userID = self.inputText.text().strip()
@@ -303,6 +334,7 @@ class TestPage(QWidget):  # Исправил название класса на 
             self.analyze(self.userID),
             self.lysher(self.userID),
         ))
+
     def onTap(self):
         t1 = threading.Thread(target=self.runAsyncTasks, daemon=True)
         t1.start()
@@ -316,6 +348,9 @@ class TestPage(QWidget):  # Исправил название класса на 
             dataForGreenFlag.append(i)
         for i in result[3]:
             dataForRecommend.append(i)
+        for i in result[4]:
+            dataForTestGerchikov.append(i)
+
     def update_output2(self, result):
         dataForTestLusher.append(result)
 
@@ -326,11 +361,10 @@ class TestPage(QWidget):  # Исправил название класса на 
     # Функция для запуска теста Люшера
     async def lysher(self, IDuser):
         self.update_output2(tL.startTestLusher(IDuser))
+
     def showEvent(self, event):
         super().showEvent(event)  # Вызов метода родителя
         self.onTap()  # Вызов вашей функции
-
-
 
 
 class OptionsPage(QWidget):  # Исправил название класса на optionsPage
@@ -341,6 +375,7 @@ class OptionsPage(QWidget):  # Исправил название класса н
         self.setStyleSheet("""
             background-color: #ffffff;
         """)
+
 
         self.layout = QGridLayout(self)  # Используйте self вместо window
         self.layout.setContentsMargins(25, 0, 25, 0)
@@ -384,7 +419,6 @@ class OptionsPage(QWidget):  # Исправил название класса н
             # Подключаем сигнал изменения текущего индекса к слоту
         self.combobox.currentIndexChanged.connect(self.on_combobox_changed)
         self.layout.addWidget(self.combobox, 0, 0)
-
 
         self.combobox.setStyleSheet("""
             font-size: 22px;
@@ -441,7 +475,7 @@ class OptionsPage(QWidget):  # Исправил название класса н
     def on_combobox_changed(self, index):
         # Получаем ключ выбранного элемента
         self.typeProf = self.combobox.itemData(index)  # Это ключ из словаря
-        value = self.combobox.currentText()   # Это отображаемое значение
+        value = self.combobox.currentText()  # Это отображаемое значение
         print(f'Выбранный элемент: {value}, Ключ: {self.typeProf}')
 
     def show_error_message(self, message):
@@ -469,30 +503,17 @@ class OptionsPage(QWidget):  # Исправил название класса н
         self.close()
 
 
-
-
-if __name__ == '__main__':  # Исправил на __name__ == '__main__'
+if __name__ == '__main__':  # Исправлено на __name__ == '__main__'
     app = QApplication([])
-    testP = authPage()  # Исправил на TestPage
-    testP.setStyleSheet(
-        "background-color: #ffffff; "
-    )
+
+    testP = authPage()
+    testP.setStyleSheet("background-color: #ffffff; ")
     testP.resize(800, 600)
     testP.show()
 
-    # testP2 = TestPage()
-    # testP2.setStyleSheet(
-    #     "background-color: #ffffff; "
-    # )
-    # testP2.resize(800, 600)
-    # testP2.show()
-
-
-    # testP3 = OptionsPage()  # Исправил на TestPage
-    # testP3.setStyleSheet(
-    #     "background-color: #ffffff; "
-    # )
-    # testP3.resize(800, 600)
-    # testP3.show()
+    # testP4 = HistoryWindow()
+    # testP4.setStyleSheet("background-color: #ffffff; ")
+    # testP4.resize(800, 600)
+    # testP4.show()
 
     exit(app.exec())

@@ -1,5 +1,12 @@
 import tkinter as tk
+from datetime import datetime
 from tkinter import ttk, messagebox
+
+from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QIcon
+from PyQt6.QtWidgets import QWidget, QPushButton, QTableWidgetItem, QMainWindow, QTableWidget, \
+    QHBoxLayout, QHeaderView, QVBoxLayout
+
 from DataBaseInterface import *
 
 def get_last_five_scans():
@@ -15,81 +22,218 @@ def get_last_five_scans():
         result.append(user_dict)
     return result
 
-
-def show_more_details(scan_id, root):
-    user_details = getUserById(scan_id)
-    if user_details:
-        # Создаём новое окно
-        details_window = tk.Toplevel(root)
-        details_window.title("Детали пользователя")
-        details_window.geometry("600x400")
-
-        # Создаём Treeview с двумя столбцами
-        tree = ttk.Treeview(details_window, columns=("field", "value"), show="headings")
-        tree.heading("field", text="Поле")
-        tree.heading("value", text="Значение")
-        tree.column("field", width=200, anchor='w')
-        tree.column("value", width=400, anchor='w')
-        tree.pack(fill=tk.BOTH, expand=True)
-
-        column_names = ["Номер сканирования", "Имя", "Фамилия", "Дата Рождения", "Общительность (в баллах)",
-                        "Грамотность (в баллах)", "Активность (в баллах)", "Вовлеченность (в баллах)", "Степень дивиации (в баллах)",
-                        "Результат", "Ссылка на профиль"]
-
-        # Вставляем пары поле-значение в Treeview
-        for col, val in zip(column_names, user_details):
-            tree.insert("", "end", values=(col, val))
+columns = ['Дата рождения', 'ID', 'Nickname', 'Рекомендация', '']
 
 
-def show_history():
-    history_window = tk.Tk()
-    history_window.title("История сканов")
-    history_window.geometry("1200x600")
-    history_window.configure(bg='White')
+
+class HistoryWindow(QWidget):
+    def __init__(self):  # Исправлено на __init__
+        super().__init__()
+
+        self.scans = get_last_five_scans()
+
+        # Создаем QTableWidget
+        self.table = QTableWidget()
+        self.table.setColumnCount(len(columns))
+        self.table.setRowCount(0)  # Начинаем с 0 строк
+
+        # Устанавливаем заголовки
+        self.table.setHorizontalHeaderLabels(columns)
+        self.table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
+        self.table.verticalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
+
+        # Заполняем таблицу данными и добавляем кнопки
+        for scan in self.scans:
+            self.add_scan_to_table(scan)
+
+        self.table.setStyleSheet("""
+            QTableWidget {
+                font-size: 12px;
+                color: #000000;
+                gridline-color: #d3d3d3;
+                background-color: white;
+            }
+            QHeaderView::section {
+                background-color: white;
+                color:#D53032;
+                padding: 5px;
+                border: 1px solid #d3d3d3;
+                border-top:none;
+                font-size: 12px;
+                font-weight: bold;
+            }
+            QTableWidget QTableCornerButton::section {
+                background-color: white;
+            }
+            QTableWidget::item {
+                padding: 5px;
+            }
+        """)
+
+        # Устанавливаем вертикальный layout
+        layout = QVBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)  # Убираем отступы
+        layout.addWidget(self.table)
+        self.setLayout(layout)
+
+    def add_scan_to_table(self, scan):
+        row_position = self.table.rowCount()
+        self.table.insertRow(row_position)
+
+        # Предполагается, что scan - это список или кортеж с данными
+        for column, data in enumerate(scan):
+            self.table.setItem(row_position, column, QTableWidgetItem(data))
+    def add_scan_to_table(self, scan):
+        row_position = self.table.rowCount()
+        self.table.insertRow(row_position)
+        self.user_details = getUserById(scan['scan_id'])
+
+        self.table.setItem(row_position, 0, QTableWidgetItem(scan['birth_date']))
+        self.table.setItem(row_position, 1, QTableWidgetItem(str(scan['scan_id'])))
+        self.table.setItem(row_position, 2, QTableWidgetItem(scan['first_name'] + " " + scan['last_name']))
+        self.table.setItem(row_position, 3, QTableWidgetItem(self.user_details[9]))  # scan['СЮДА ТИПО РЕКОМЕНДАЦИЮ']
+
+        button_widget = QWidget()
+        button_layout = QHBoxLayout(button_widget)
+
+        # Создаем кнопку "Подробнее"
+        button = QPushButton("Подробнее")
+        button.clicked.connect(lambda checked, r=row_position: self.on_button_click(r))
+        button.setStyleSheet("""
+            QPushButton {
+                background-color: white;
+                border: 1px solid #D53032;
+                padding:5px;
+                color: #D53032;
+                font-size: 12px;
+                border-radius: 5px;
+            }
+        """)
+
+        # Создаем кнопку удаления
+        buttonDelete = QPushButton()
+        buttonDelete.setIcon(QIcon("iconDelete.png"))  # Укажите путь к вашей иконке
+        buttonDelete.clicked.connect(lambda checked, r=row_position: self.on_delete_button_click(r))
+
+        buttonDelete.setStyleSheet("""
+            QPushButton {
+                background-color: white;
+                color: #D53032;
+            }
+        """)
+
+        button_layout.addWidget(button)
+        button_layout.addWidget(buttonDelete)
+
+        self.table.setCellWidget(row_position, 4, button_widget)
+
+    def on_delete_button_click(self, row):
+        print(f"Delete button in row {row + 1} clicked!")
+
+        self.table.removeRow(row)  # Удаляем строку из таблицы
+
+        print(self.table.rowCount())
+
+        if self.table.rowCount() == 0:
+            self.table.setRowCount(0)
+            print("Таблица теперь пуста.")
 
 
-    columns = ("scan_id", "first_name", "last_name", "birth_date", "more")
-    tree = ttk.Treeview(history_window, columns=columns, show="headings")
 
-    tree.heading("scan_id", text="Номер скана")
-    tree.heading("first_name", text="Имя")
-    tree.heading("last_name", text="Фамилия")
-    tree.heading("birth_date", text="Дата Рождения")
-    tree.heading("more", text="Более")
+    def on_button_click(self, row):
+        print(f"Button in row {row + 1} clicked!")
+        self.scanId = self.scans[row]['scan_id']
+        try:
+            self.scanId = int(self.scanId)
+        except ValueError:
+            messagebox.showerror("Ошибка", "Неверный ID скана.")
+            return
+        self.HistoryDetailWindow = HistoryDetailWindow(self.scanId)
+        self.HistoryDetailWindow.show()
 
-    tree.column("scan_id", width=100, anchor='center')
-    tree.column("first_name", width=150, anchor='center')
-    tree.column("last_name", width=150, anchor='center')
-    tree.column("birth_date", width=150, anchor='center')
-    tree.column("more", width=100, anchor='center')
 
-    scans = get_last_five_scans()
-    for scan in scans:
-        tree.insert("", "end",
-                    values=(scan["scan_id"], scan["first_name"], scan["last_name"], scan["birth_date"], "Более"))
 
-    tree.pack(fill=tk.BOTH, expand=True)
+class HistoryDetailWindow(QMainWindow):
+    def __init__(self, scanId):
+        super().__init__()
 
-    scrollbar = ttk.Scrollbar(history_window, orient=tk.VERTICAL, command=tree.yview)
-    tree.configure(yscroll=scrollbar.set)
-    scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+        self.setWindowTitle('HR SOLUTION')
+        self.resize(800, 600)
+        self.setStyleSheet("""
+            background-color: #ffffff;
+        """)
 
-    def on_single_click(event):
-        region = tree.identify("region", event.x, event.y)
-        if region == "cell":
-            column = tree.identify_column(event.x)
-            if column == "#5":  # Пятый столбец "Более"
-                row = tree.identify_row(event.y)
-                if row:
-                    scan_id = tree.item(row, "values")[0]
-                    try:
-                        scan_id = int(scan_id)
-                    except ValueError:
-                        messagebox.showerror("Ошибка", "Неверный ID скана.")
-                        return
-                    show_more_details(scan_id, history_window)
+        self.scanId = scanId
+        self.user_details = getUserById(scanId)
+        if self.user_details:
+            # Создаем центральный виджет и основной вертикальный макет
+            central_widget = QWidget()
+            self.setCentralWidget(central_widget)
+            main_layout = QVBoxLayout(central_widget)
 
-    tree.bind("<Button-1>", on_single_click)
+            # Убираем отступы
+            main_layout.setContentsMargins(0, 0, 0, 0)
 
-    history_window.mainloop()
+            # Создаем таблицу
+            self.table_widget = QTableWidget(11, 2)
+            self.table_widget.setHorizontalHeaderLabels(["Поле", "Значение"])
 
+            self.table_widget.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
+            self.table_widget.verticalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
+
+            self.table_widget.setStyleSheet("""
+                QTableWidget {
+                    font-size: 12px;
+                    color: #000000;
+                    gridline-color: #d3d3d3;
+                    background-color: white;
+                }
+                QHeaderView::section {
+                    background-color: white;
+                    color:#D53032;
+                    padding: 5px;
+                    border: 1px solid #d3d3d3;
+                    border-top:none;
+                    font-size: 12px;
+                    font-weight: bold;
+                }
+                QTableWidget QTableCornerButton::section {
+                    background-color: white;
+                }
+                QTableWidget::item {
+                    padding: 5px;
+                }
+            """)
+
+            # Заполняем таблицу данными
+            data = [
+                ("Номер сканирования", str(self.user_details[0])),
+                ("Имя", str(self.user_details[1])),
+                ("Фамилия", str(self.user_details[2])),
+                ("Дата Рождения", str(self.user_details[3])),
+                ("Общительность (в баллах)", str(self.user_details[4])),
+                ("Грамотность (в баллах)", str(self.user_details[5])),
+                ("Активность (в баллах)", str(self.user_details[6])),
+                ("Вовлеченность (в баллах)", str(self.user_details[7])),
+                ("Степень дивации (в баллах)", str(self.user_details[8])),
+                ("Результат", str(self.user_details[9])),
+                ("Ссылка на профиль", str(self.user_details[10])),
+            ]
+
+            for row, (field, value) in enumerate(data):
+                field_item = QTableWidgetItem(field)
+                field_item.setFlags(
+                    Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsEnabled)  # Запрет редактирования первого столбца
+                self.table_widget.setItem(row, 0, field_item)
+
+                value_item = QTableWidgetItem(value)
+                value_item.setFlags(
+                    Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsEnabled)  # Запрет редактирования второго столбца
+                self.table_widget.setItem(row, 1, value_item)
+
+            # Добавляем таблицу в основной макет
+            main_layout.addWidget(self.table_widget)
+
+    def open_link(self):
+        import webbrowser
+        webbrowser.open(str(self.user_details[10]))
