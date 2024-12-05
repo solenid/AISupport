@@ -509,7 +509,6 @@ def getInfoFromVK(userID: str, serviceToken, userToken, type):
         if totalWords > 0:
             if gerchikovKeyWords(postsText, False) > 3:
                 resultGerchikov += "Патриотический тип\nОснован на любви сотрудника к своей компании и стремлении приносить ей пользу. Поощрением для таких сотрудников может служить публичное признание их вклада в успех компании, награды за лояльность и долгосрочную службу.\n\n"
-    
     if len(resultGerchikov) > 0:
         result[0].append("Тип мотивации по Герчикову:")
         result[0].append(resultGerchikov)
