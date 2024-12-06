@@ -1,6 +1,8 @@
 import vk_api
 import time
 import tkinter as tk
+
+# import Main
 from CheckSpelling import *
 from WordsFinder import *
 from GetPosts import *
@@ -529,5 +531,6 @@ def getInfoFromVK(userID: str, serviceToken, userToken, type):
     dataDB.clear()
     print("Массив Очищен")
 
+    # Main.statusLoad = 1
 
     return result
