@@ -59,6 +59,25 @@ def addUser(lastName, firstName, birthDate, criteriaCommun, criteriaLiter,
     except sqlite3.Error as e:
         print(f"Ошибка при добавлении пользователя: {e}")
 
+def deleteUserById(user_id):
+    """
+    Удаляет пользователя по его userID.
+    """
+    try:
+        with sqlite3.connect('history.db') as conn:
+            cursor = conn.cursor()
+            cursor.execute('''
+                        DELETE FROM scan_history
+                        WHERE userID = ?
+                    ''', (user_id,))
+            conn.commit()
+            if cursor.rowcount:
+                print(f"Пользователь с ID {user_id} успешно удалён.")
+            else:
+                print(f"Пользователь с ID {user_id} не найден.")
+    except sqlite3.Error as e:
+        print(f"Ошибка при удалении пользователя: {e}")
+
 def getLast5Users():
     """
     Возвращает последние 5 добавленных пользователей.
@@ -94,21 +113,3 @@ def getUserById(user_id):
         print(f"Ошибка при получении пользователя: {e}")
         return None
 
-def deleteUserById(user_id):
-    """
-    Удаляет пользователя по его userID.
-    """
-    try:
-        with sqlite3.connect('history.db') as conn:
-            cursor = conn.cursor()
-            cursor.execute('''
-                        DELETE FROM scan_history
-                        WHERE userID = ?
-                    ''', (user_id,))
-            conn.commit()
-            if cursor.rowcount:
-                print(f"Пользователь с ID {user_id} успешно удалён.")
-            else:
-                print(f"Пользователь с ID {user_id} не найден.")
-    except sqlite3.Error as e:
-        print(f"Ошибка при удалении пользователя: {e}")
