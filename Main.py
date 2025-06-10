@@ -1,10 +1,8 @@
 import re
 import sys
 
-from PyQt6.QtCore import Qt, QTimer
-from PyQt6.QtWidgets import QApplication, QWidget, QVBoxLayout, QLabel, QRadioButton, QCheckBox, QPushButton, \
+from PyQt6.QtWidgets import QApplication, QLabel, \
     QGridLayout, QDialog, QLineEdit, QTextEdit, QComboBox, QMessageBox, QSizePolicy, QSpacerItem
-from PyQt6.QtGui import QIcon
 
 from Authorization import *  # Убедитесь, что этот импорт корректен
 # Для асинхронности
@@ -25,6 +23,14 @@ dataForTestGerchikov = [""]
 serviceToken = getToken()
 statusLoad = 0
 
+def getNumericID(userIdentifier, accessToken, apiVersion='5.131'):
+    url = 'https://api.vk.com/method/users.get'
+    params = {'user_ids': userIdentifier,
+              'access_token': accessToken,
+              'v': apiVersion}
+    response = requests.get(url, params=params)
+    data = response.json()
+    return str(data['response'][0]['id'])
 
 def extractIdentifier(vkURL):
     pattern = r'https?://(?:www\.)?vk\.com/([^/?#&]+)'
@@ -35,26 +41,16 @@ def extractIdentifier(vkURL):
         return None
 
 
-def getNumericID(userIdentifier, accessToken, apiVersion='5.131'):
-    url = 'https://api.vk.com/method/users.get'
-    params = {'user_ids': userIdentifier,
-              'access_token': accessToken,
-              'v': apiVersion}
-    response = requests.get(url, params=params)
-    data = response.json()
-    return str(data['response'][0]['id'])
-
-
-class authPage(QWidget):  # Исправил название класса на TestPage
-    def __init__(self):  # Исправил метод на __init__
-        super().__init__()  # Исправил вызов супер-класса
+class authPage(QWidget):
+    def __init__(self):  
+        super().__init__() 
         self.setWindowTitle('HR SOLUTION')
-        self.resize(800, 600)  # Установите размер окна здесь
+        self.resize(800, 600) 
         self.setStyleSheet("""
             background-color: #ffffff;
         """)
 
-        self.layout = QGridLayout(self)  # Используйте self вместо window
+        self.layout = QGridLayout(self)
         self.layout.setContentsMargins(0, 0, 0, 0)
         self.layout.setSpacing(0)
         self.layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -92,22 +88,22 @@ class authPage(QWidget):  # Исправил название класса на 
 
     def authorization(self):
         global userToken
-        userToken = userAuthorization()  # Убедитесь, что эта функция определена
+        userToken = userAuthorization() 
         myDi = QDialog(self)
         if userToken == '':
             myDi.setWindowTitle("Ошибка")
             myDi.setModal(True)
-            myDi.exec()  # Показываем диалог
+            myDi.exec()  
             return
         print(userToken)
         self.show_optionsPage()
 
 
-class TestPage(QWidget):  # Исправил название класса на TestPage
-    def __init__(self, userID, InputTypeProf, prof):  # Исправил метод на __init__
-        super().__init__()  # Исправил вызов супер-класса
+class TestPage(QWidget): 
+    def __init__(self, userID, InputTypeProf, prof):  
+        super().__init__()  
         self.setWindowTitle('HR SOLUTION')
-        self.resize(1000, 600)  # Установите размер окна здесь
+        self.resize(1000, 600)  
         self.setStyleSheet("""
             background-color: #ffffff;
         """)
