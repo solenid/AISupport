@@ -2,7 +2,6 @@ import vk_api
 import time
 import tkinter as tk
 
-# import Main
 from CheckSpelling import *
 from WordsFinder import *
 from GetPosts import *
@@ -20,76 +19,6 @@ def getVKSession(token):
     except VkApiError as e:
         print(f"Ошибка при подключении к VK API: {e}")
         return None
-
-def getNumberOfFriends(vk, userID):
-    try:
-        response = vk.friends.get(user_id=userID, count=0)
-        return response['count']
-    except VkApiError as e:
-        print(f"Ошибка при получении друзей: {e}")
-        return None
-
-def getTotalComments(posts):
-    return sum(post.get('comments', {}).get('count', 0) for post in posts)
-
-def getTotalLikes(posts):
-    return sum(post.get('likes', {}).get('count', 0) for post in posts)
-
-def getPostsText(posts):
-    return [post.get('text', '') for post in posts]
-
-def getPublicsTheme(vk, userID):
-    try:
-        response = vk.groups.get(user_id=userID, count=0)
-        return response['count']
-    except VkApiError as e:
-        print(f"Ошибка при получении групп: {e}")
-        return None
-
-def getCriteriaGrade(score):
-    result = "Низкая"
-    if score > 2:
-        if score > 4:
-            result = "Высокая"
-        else:
-            result = "Средняя"
-    elif score < 0:
-        result = "Не определено" #\n(веротяно нет постов или слов в них)"
-    return result
-
-def getGroupsTheme(vk, userID):
-    dictionaryThemes = {}
-    garbageThemesKeyWords = ["заблокирован", "закрытое", "закрытый", "недоступный", "недоступно"] # Здесь добавляем
-                                                                        # ключевые слова ненужных нам тем (строчными)
-    offset = 0
-    count = 1000
-    while True: # Зачем?
-        try:
-            response = vk.groups.get(
-                user_id=userID,
-                extended=1,
-                fields='activity',
-                offset=offset,
-                count=count
-            )
-        except VkApiError as error:
-            print(f"Ошибка при получении групп: {error}")
-            break
-        groups = response.get('items', [])
-        if not groups:
-            break
-        for group in groups:
-            activity = group.get('activity')
-            if activity and not any(keyword in activity.lower() for keyword in garbageThemesKeyWords):
-                if activity in dictionaryThemes:
-                    dictionaryThemes[f'{activity}'] += 1
-                else:
-                    dictionaryThemes[f'{activity}'] = 1
-        offset += count
-    sortedDict = {key: value for key,
-    value in sorted(dictionaryThemes.items(),
-                    key=lambda item: item[1], reverse=True)}
-    return list(sortedDict.keys())
 
 def getBase(vk, userID):
     result = []
@@ -129,6 +58,14 @@ def getBase(vk, userID):
         print(f"Ошибка при информации профиля: {e}")
     return result
 
+def getNumberOfFriends(vk, userID):
+    try:
+        response = vk.friends.get(user_id=userID, count=0)
+        return response['count']
+    except VkApiError as e:
+        print(f"Ошибка при получении друзей: {e}")
+        return None
+
 def getPhotoCount(vk, userID):
     resPhotos = 0
     try:
@@ -143,6 +80,68 @@ def getPhotoCount(vk, userID):
                 resPhotos += 1
     return resPhotos
 
+def getTotalComments(posts):
+    return sum(post.get('comments', {}).get('count', 0) for post in posts)
+
+def getTotalLikes(posts):
+    return sum(post.get('likes', {}).get('count', 0) for post in posts)
+
+def getPostsText(posts):
+    return [post.get('text', '') for post in posts]
+
+def getPublicsTheme(vk, userID):
+    try:
+        response = vk.groups.get(user_id=userID, count=0)
+        return response['count']
+    except VkApiError as e:
+        print(f"Ошибка при получении групп: {e}")
+        return None
+
+def getGroupsTheme(vk, userID):
+    dictionaryThemes = {}
+    garbageThemesKeyWords = ["заблокирован", "закрытое", "закрытый", "недоступный", "недоступно"] # Здесь добавляем
+                                                                        # ключевые слова ненужных нам тем (строчными)
+    offset = 0
+    count = 1000
+    while True: # Зачем?
+        try:
+            response = vk.groups.get(
+                user_id=userID,
+                extended=1,
+                fields='activity',
+                offset=offset,
+                count=count
+            )
+        except VkApiError as error:
+            print(f"Ошибка при получении групп: {error}")
+            break
+        groups = response.get('items', [])
+        if not groups:
+            break
+        for group in groups:
+            activity = group.get('activity')
+            if activity and not any(keyword in activity.lower() for keyword in garbageThemesKeyWords):
+                if activity in dictionaryThemes:
+                    dictionaryThemes[f'{activity}'] += 1
+                else:
+                    dictionaryThemes[f'{activity}'] = 1
+        offset += count
+    sortedDict = {key: value for key,
+    value in sorted(dictionaryThemes.items(),
+                    key=lambda item: item[1], reverse=True)}
+    return list(sortedDict.keys())
+
+def getCriteriaGrade(score):
+    result = "Низкая"
+    if score > 2:
+        if score > 4:
+            result = "Высокая"
+        else:
+            result = "Средняя"
+    elif score < 0:
+        result = "Не определено" #\n(веротяно нет постов или слов в них)"
+    return result
+
 def getInfoFromVK(userID: str, serviceToken, userToken, type):
     # Флаги оценок
     criteriaCommun = 0  # Общительность
@@ -156,7 +155,7 @@ def getInfoFromVK(userID: str, serviceToken, userToken, type):
     greatErrNum = 0.25
     # Остальное зависит от типа
     if type == 0: #Человек природа
-        # Ш-Общительность
+        # Общительность
         midSFrNum = 30
         greatSFrNum = 70
         midPhotoNum = 1
@@ -174,7 +173,7 @@ def getInfoFromVK(userID: str, serviceToken, userToken, type):
         midALikeNum = 40
         greatALikeNum = 90
     elif type == 1 or type == -1: #Человек человек (Здесь находится наш основной путь PR)
-        # Ш-Общительность
+        # Общительность
         midSFrNum = 100
         greatSFrNum = 200
         midPhotoNum = 5
@@ -192,7 +191,7 @@ def getInfoFromVK(userID: str, serviceToken, userToken, type):
         midALikeNum = 100
         greatALikeNum = 150
     elif type == 2: #Человек знак
-        # Ш-Общительность
+        # Общительность
         midSFrNum = 40
         greatSFrNum = 80
         midPhotoNum = 2
@@ -210,7 +209,7 @@ def getInfoFromVK(userID: str, serviceToken, userToken, type):
         midALikeNum = 55
         greatALikeNum = 120
     elif type == 3: #Человек техника
-        # Ш-Общительность
+        # Общительность
         midSFrNum = 35
         greatSFrNum = 75
         midPhotoNum = 1
@@ -228,7 +227,7 @@ def getInfoFromVK(userID: str, serviceToken, userToken, type):
         midALikeNum = 40
         greatALikeNum = 90
     elif type == 4: #Человек босс художки
-        # Ш-Общительность
+        # Общительность
         midSFrNum = 120
         greatSFrNum = 200
         midPhotoNum = 7
@@ -438,12 +437,14 @@ def getInfoFromVK(userID: str, serviceToken, userToken, type):
             result[3].append(text)
             dataDB.append(text)
         #Рекомендую
+        
+        
         elif criteriaCommun > 2 and criteriaLiter > 2 and criteriaRedFlag <= 2:
             text = "РЕКОМЕНДУЮ на основании:\n> Общительность, Грамотность - на высоком/среднем уровне"
             result[3].append(text)
             dataDB.append(text)
-        elif criteriaActivity > 2 and criteriaConcen > 2 and criteriaRedFlag <= 2:
-            text = "РЕКОМЕНДУЮ на основании:\n> Активность, Вовлеченность - на высоком/среднем уровне"
+        elif criteriaLiter > 2 and criteriaConcen > 2 and criteriaRedFlag <= 2:
+            text = "РЕКОМЕНДУЮ на основании:\n> Грамотность, Вовлеченность - на высоком/среднем уровне"
             result[3].append(text)
             dataDB.append(text)
         elif criteriaCommun > 2 and criteriaActivity > 2 and criteriaRedFlag <= 2:
@@ -454,37 +455,37 @@ def getInfoFromVK(userID: str, serviceToken, userToken, type):
             text = "РЕКОМЕНДУЮ на основании:\n> Общительность, Вовлеченность - на высоком/среднем уровне"
             result[3].append(text)
             dataDB.append(text)
+        elif criteriaActivity > 2 and criteriaConcen > 2 and criteriaRedFlag <= 2:
+            text = "РЕКОМЕНДУЮ на основании:\n> Активность, Вовлеченность - на высоком/среднем уровне"
+            result[3].append(text)
+            dataDB.append(text)
         elif criteriaLiter > 2 and criteriaActivity > 2 and criteriaRedFlag <= 2:
             text = "РЕКОМЕНДУЮ на основании:\n> Грамотность,Активность - на высоком/среднем уровне"
             result[3].append(text)
             dataDB.append(text)
-        elif criteriaLiter > 2 and criteriaConcen > 2 and criteriaRedFlag <= 2:
-            text = "РЕКОМЕНДУЮ на основании:\n> Грамотность, Вовлеченность - на высоком/среднем уровне"
-            result[3].append(text)
-            dataDB.append(text)
         # Рекомендую, НО
-        elif criteriaCommun > 2 and criteriaLiter > 2 and criteriaRedFlag <= 2:
-            text = "РЕКОМЕНДУЮ на основании:\n> Общительность, Грамотность - на высоком/среднем уровне\n> ! ОБРАТИТЕ ВНИМАНИЕ, СРЕДНИЙ УРОВЕНЬ ДИВИАЦИИ !"
-            result[3].append(text)
-            dataDB.append(text)
-        elif criteriaActivity > 2 and criteriaConcen > 2 and criteriaRedFlag <= 2:
-            text = "РЕКОМЕНДУЮ на основании:\n> Активность, Вовлеченность - на высоком/среднем уровне\n> ! ОБРАТИТЕ ВНИМАНИЕ. СРЕДНИЙ УРОВЕНЬ ДИВИАЦИИ !"
+        elif criteriaLiter > 2 and criteriaConcen > 2 and criteriaRedFlag <= 2:
+            text = "РЕКОМЕНДУЮ на основании:\n> Грамотность, Вовлеченность - на высоком/среднем уровне\n> ! ОБРАТИТЕ ВНИМАНИЕ, СРЕДНИЙ УРОВЕНЬ ДИВИАЦИИ !"
             result[3].append(text)
             dataDB.append(text)
         elif criteriaCommun > 2 and criteriaActivity > 2 and criteriaRedFlag <= 2:
             text = "РЕКОМЕНДУЮ на основании:\n> Общительность, Активность- на высоком/среднем уровне\n> ! ОБРАТИТЕ ВНИМАНИЕ, СРЕДНИЙ УРОВЕНЬ ДИВИАЦИИ !"
             result[3].append(text)
             dataDB.append(text)
+        elif criteriaCommun > 2 and criteriaLiter > 2 and criteriaRedFlag <= 2:
+            text = "РЕКОМЕНДУЮ на основании:\n> Общительность, Грамотность - на высоком/среднем уровне\n> ! ОБРАТИТЕ ВНИМАНИЕ, СРЕДНИЙ УРОВЕНЬ ДИВИАЦИИ !"
+            result[3].append(text)
+            dataDB.append(text)
         elif criteriaCommun > 2 and criteriaConcen > 2 and criteriaRedFlag <= 2:
             text = "РЕКОМЕНДУЮ на основании:\n> Общительность, Вовлеченность - на высоком/среднем уровне\n> ! ОБРАТИТЕ ВНИМАНИЕ, СРЕДНИЙ УРОВЕНЬ ДИВИАЦИИ !"
             result[3].append(text)
             dataDB.append(text)
-        elif criteriaLiter > 2 and criteriaActivity > 2 and criteriaRedFlag <= 2:
-            text = "РЕКОМЕНДУЮ на основании:\n> Грамотность,Активность - на высоком/среднем уровне\n> ! ОБРАТИТЕ ВНИМАНИЕ, СРЕДНИЙ УРОВЕНЬ ДИВИАЦИИ !"
+        elif criteriaActivity > 2 and criteriaConcen > 2 and criteriaRedFlag <= 2:
+            text = "РЕКОМЕНДУЮ на основании:\n> Активность, Вовлеченность - на высоком/среднем уровне\n> ! ОБРАТИТЕ ВНИМАНИЕ. СРЕДНИЙ УРОВЕНЬ ДИВИАЦИИ !"
             result[3].append(text)
             dataDB.append(text)
-        elif criteriaLiter > 2 and criteriaConcen > 2 and criteriaRedFlag <= 2:
-            text = "РЕКОМЕНДУЮ на основании:\n> Грамотность, Вовлеченность - на высоком/среднем уровне\n> ! ОБРАТИТЕ ВНИМАНИЕ, СРЕДНИЙ УРОВЕНЬ ДИВИАЦИИ !"
+        elif criteriaLiter > 2 and criteriaActivity > 2 and criteriaRedFlag <= 2:
+            text = "РЕКОМЕНДУЮ на основании:\n> Грамотность,Активность - на высоком/среднем уровне\n> ! ОБРАТИТЕ ВНИМАНИЕ, СРЕДНИЙ УРОВЕНЬ ДИВИАЦИИ !"
             result[3].append(text)
             dataDB.append(text)
         # Не рекомендую
@@ -496,10 +497,6 @@ def getInfoFromVK(userID: str, serviceToken, userToken, type):
         # Не рекомендую
         result[3].append(f"НЕ РЕКОМЕНДУЮ на основании слишком высокой степени Дивиации")
 
-
-    #Блок Герчикова
-    #НАДО ПРИДУМАТЬ КУДА ЭТО СКЛАДЫВАТЬ, ВЕРОЯТНО ОТДЕЛЬНАЯ КНОПКА И ОТДЕЛЬНАЯ ВКЛАДКА
-    #НО Я БЫ ПЕРЕИМЕНОВАЛ ВКЛАДКУ С ЛЮЩЕРОМ И ПИСАЛ ТУДА
     resultGerchikov = ""
     if criteriaRedFlag > 4:
         resultGerchikov += "Избегательный тип\nХарактеризуется отсутствием у сотрудника четких ценностей и профессиональных ориентиров. Поощрение и наказание в данном случае могут быть сложными, так как такие сотрудники могут не реагировать на обычные стимулы.\n\n"
@@ -530,7 +527,4 @@ def getInfoFromVK(userID: str, serviceToken, userToken, type):
     print("Очистка массива ...")
     dataDB.clear()
     print("Массив Очищен")
-
-    # Main.statusLoad = 1
-
     return result
