@@ -3,16 +3,6 @@ import pytest
 from unittest.mock import patch, MagicMock
 from DataBaseInterface import initializeDB, addUser, getLast5Users, getUserById, deleteUserById
 
-@patch('sqlite3.connect')
-def test_initialize_db_success(mock_connect):
-    mock_conn = MagicMock()
-    mock_cursor = MagicMock()
-    mock_connect.return_value = mock_conn
-    mock_conn.cursor.return_value = mock_cursor
-    
-    initializeDB()
-    mock_cursor.execute.assert_called()
-
 @patch('DataBaseInterface.initializeDB')
 @patch('sqlite3.connect')
 def test_add_user_success(mock_connect, mock_init):
@@ -55,4 +45,14 @@ def test_delete_user_by_id(mock_connect):
     mock_cursor.rowcount = 1
     
     deleteUserById(1)
+    mock_cursor.execute.assert_called()
+
+@patch('sqlite3.connect')
+def test_initialize_db_success(mock_connect):
+    mock_conn = MagicMock()
+    mock_cursor = MagicMock()
+    mock_connect.return_value = mock_conn
+    mock_conn.cursor.return_value = mock_cursor
+    
+    initializeDB()
     mock_cursor.execute.assert_called()
